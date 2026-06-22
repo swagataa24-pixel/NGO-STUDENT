@@ -162,7 +162,7 @@ export function LoginPage({ activeUser, setActiveUser }) {
                   {/* ── Sign Up panel ── */}
                   <form className="auth-form-pane" onSubmit={handleSubmit} noValidate>
                     <h1 className="form-title">Create Account</h1>
-                    <p className="auth-intro">New accounts start as <strong>Viewer</strong> and can be promoted by an admin.</p>
+                    <p className="auth-intro">New accounts join as <strong>Teacher / Volunteer</strong> with full access to operations.</p>
 
                     <div className="field-group">
                       <label htmlFor="su-name">Full name</label>

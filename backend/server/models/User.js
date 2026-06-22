@@ -24,7 +24,10 @@ const userSchema = new mongoose.Schema(
 // Encrypt sensitive fields before saving
 userSchema.pre('save', function (next) {
   if (this.isModified('name') && !isEncrypted(this.name))    this.name    = encrypt(this.name);
-  if (this.isModified('email') && !isEncrypted(this.email))  this.email   = encrypt(this.email);
+  if (this.isModified('email') && !isEncrypted(this.email))  {
+    this.emailIndex = hmacIndex(this.email);
+    this.email   = encrypt(this.email);
+  }
   if (this.isModified('avatar') && this.avatar && !isEncrypted(this.avatar)) this.avatar = encrypt(this.avatar);
   next();
 });

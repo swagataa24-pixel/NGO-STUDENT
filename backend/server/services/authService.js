@@ -17,7 +17,7 @@ function normalizeEmail(email) {
 }
 
 function resolveRole(email) {
-  return parseAdminEmails().includes(normalizeEmail(email)) ? 'Admin' : 'Viewer';
+  return parseAdminEmails().includes(normalizeEmail(email)) ? 'Admin' : 'Teacher';
 }
 
 export function buildToken(user) {

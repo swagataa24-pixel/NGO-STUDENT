@@ -197,7 +197,7 @@ export function AdminPage({ students, photos, activeUser }) {
                           style={{ color: ROLE_COLORS[user.role] }}
                         >
                           <option value="Viewer">Viewer</option>
-                          <option value="Teacher">Teacher</option>
+                          <option value="Teacher">Teacher / Volunteer</option>
                           <option value="Admin">Admin</option>
                         </select>
                       </td>

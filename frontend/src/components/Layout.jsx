@@ -46,7 +46,7 @@ export function Layout({ activeUser, onSignOut }) {
   const showSystem = canSee(role, 'Admin');
 
   const visiblePublicNavItems = publicNavItems;
-  const visibleOperationsNavItems = showOperations ? operationsNavItems : [];
+  const visibleOperationsNavItems = operationsNavItems; // always visible; auth check happens at route level
 
   return (
     <>
