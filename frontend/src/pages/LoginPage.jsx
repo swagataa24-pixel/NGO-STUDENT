@@ -70,8 +70,8 @@ export function LoginPage({ activeUser, setActiveUser }) {
                 <span className="eyebrow">Signed in</span>
                 <h3>{activeUser.name}</h3>
                 <p>{activeUser.role} access is ready.</p>
-                <a className="primary-button dashboard-button" href={config.routes.students}>
-                  <Gauge size={18} /> Go to dashboard
+                <a className="primary-button dashboard-button" href={config.routes.home}>
+                  <Gauge size={18} /> Go home
                 </a>
               </div>
             ) : (
