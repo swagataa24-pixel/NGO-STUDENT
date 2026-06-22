@@ -43,8 +43,12 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
   const [saveState, setSaveState] = useState('');
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [showEditCamera, setShowEditCamera] = useState(false);
+  const videoRef = useRef(null);
+  const editVideoRef = useRef(null);
+  const streamRef = useRef(null);
+  const editStreamRef = useRef(null);
 
   useEffect(() => {
     if (classId) {
@@ -73,19 +77,59 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
     reader.readAsDataURL(file);
   };
 
-  const handleCameraCapture = (event, isEdit = false) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
+  const startCamera = async (isEdit = false) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+        audio: false
+      });
       if (isEdit) {
-        setEditingStudent((prev) => ({ ...prev, photoUrl: base64 }));
+        editStreamRef.current = stream;
+        if (editVideoRef.current) {
+          editVideoRef.current.srcObject = stream;
+        }
+        setShowEditCamera(true);
       } else {
-        setStudentForm((prev) => ({ ...prev, photoUrl: base64 }));
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setShowCamera(true);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      alert('Could not access camera. Please check permissions.');
+    }
+  };
+
+  const stopCamera = (isEdit = false) => {
+    const stream = isEdit ? editStreamRef.current : streamRef.current;
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    if (isEdit) {
+      setShowEditCamera(false);
+    } else {
+      setShowCamera(false);
+    }
+  };
+
+  const capturePhoto = (isEdit = false) => {
+    const video = isEdit ? editVideoRef.current : videoRef.current;
+    if (!video) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const base64 = canvas.toDataURL('image/png');
+    if (isEdit) {
+      setEditingStudent((prev) => ({ ...prev, photoUrl: base64 }));
+      stopCamera(true);
+    } else {
+      setStudentForm((prev) => ({ ...prev, photoUrl: base64 }));
+      stopCamera(false);
+    }
   };
 
   const saveClass = async (event) => {
@@ -374,11 +418,10 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                   <span>Student Photo</span>
                   <div className="photo-upload-buttons">
                     <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={(e) => handleFileUpload(e, false)} />
-                    <input type="file" accept="image/*" capture="environment" ref={cameraInputRef} style={{ display: 'none' }} onChange={(e) => handleCameraCapture(e, false)} />
                     <button type="button" className="secondary-button" onClick={() => fileInputRef.current?.click()}>
                       <ImagePlus size={16} /> Upload Photo
                     </button>
-                    <button type="button" className="secondary-button" onClick={() => cameraInputRef.current?.click()}>
+                    <button type="button" className="secondary-button" onClick={() => startCamera(false)}>
                       <Camera size={16} /> Take Photo
                     </button>
                   </div>
@@ -425,13 +468,51 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
           editingStudent={editingStudent}
           setEditingStudent={setEditingStudent}
           onClose={() => {
+            if (showEditCamera) stopCamera(true);
             setSelectedStudentId(null);
             setEditingStudent(null);
           }}
           onEdit={() => startEdit(selectedStudent)}
           onSave={saveStudent}
           onDelete={() => deleteStudent(mongoId(selectedStudent))}
+          startCamera={startCamera}
+          stopCamera={stopCamera}
+          capturePhoto={capturePhoto}
+          showEditCamera={showEditCamera}
+          editVideoRef={editVideoRef}
         />
+      )}
+
+      {showCamera && (
+        <div className="camera-modal">
+          <div className="camera-content">
+            <button className="icon-button camera-close" onClick={() => stopCamera(false)}>
+              <X size={18} />
+            </button>
+            <video ref={videoRef} autoPlay playsInline muted />
+            <div className="camera-controls">
+              <button className="primary-button camera-capture" onClick={() => capturePhoto(false)}>
+                <Camera size={24} /> Capture Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditCamera && (
+        <div className="camera-modal">
+          <div className="camera-content">
+            <button className="icon-button camera-close" onClick={() => stopCamera(true)}>
+              <X size={18} />
+            </button>
+            <video ref={editVideoRef} autoPlay playsInline muted />
+            <div className="camera-controls">
+              <button className="primary-button camera-capture" onClick={() => capturePhoto(true)}>
+                <Camera size={24} /> Capture Photo
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );
@@ -481,27 +562,20 @@ function StudentDetailPanel({
   onClose,
   onEdit,
   onSave,
-  onDelete
+  onDelete,
+  startCamera,
+  stopCamera,
+  capturePhoto,
+  showEditCamera,
+  editVideoRef
 }) {
   const isEditing = Boolean(editingStudent);
   const data = editingStudent || student;
   const value = percent(student);
   const update = (field, val) => setEditingStudent((current) => ({ ...current, [field]: val }));
   const editFileInputRef = useRef(null);
-  const editCameraInputRef = useRef(null);
 
   const handleEditFileUpload = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
-      setEditingStudent((prev) => ({ ...prev, photoUrl: base64 }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleEditCameraCapture = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
@@ -551,11 +625,10 @@ function StudentDetailPanel({
                 <span>Student Photo</span>
                 <div className="photo-upload-buttons">
                   <input type="file" accept="image/*" ref={editFileInputRef} style={{ display: 'none' }} onChange={handleEditFileUpload} />
-                  <input type="file" accept="image/*" capture="environment" ref={editCameraInputRef} style={{ display: 'none' }} onChange={handleEditCameraCapture} />
                   <button type="button" className="secondary-button" onClick={() => editFileInputRef.current?.click()}>
                     <ImagePlus size={16} /> Upload Photo
                   </button>
-                  <button type="button" className="secondary-button" onClick={() => editCameraInputRef.current?.click()}>
+                  <button type="button" className="secondary-button" onClick={() => startCamera(true)}>
                     <Camera size={16} /> Take Photo
                   </button>
                 </div>
