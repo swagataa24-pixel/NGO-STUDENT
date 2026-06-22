@@ -9,17 +9,41 @@ import { apiRequest } from './utils/api.js';
 import { percent } from './utils/attendance.js';
 import './styles.css';
 
-const HomePage = lazy(() => import('./pages/HomePage.jsx').then((module) => ({ default: module.HomePage })));
-const AboutPage = lazy(() => import('./pages/AboutPage.jsx').then((module) => ({ default: module.AboutPage })));
-const ProgramsPage = lazy(() => import('./pages/ProgramsPage.jsx').then((module) => ({ default: module.ProgramsPage })));
-const StudentsPage = lazy(() => import('./pages/StudentsPage.jsx').then((module) => ({ default: module.StudentsPage })));
-const AttendancePage = lazy(() => import('./pages/AttendancePage.jsx').then((module) => ({ default: module.AttendancePage })));
-const VolunteersPage = lazy(() => import('./pages/VolunteersPage.jsx').then((module) => ({ default: module.VolunteersPage })));
-const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx').then((module) => ({ default: module.ReportsPage })));
-const GalleryPage = lazy(() => import('./pages/GalleryPage.jsx').then((module) => ({ default: module.GalleryPage })));
-const ContactPage = lazy(() => import('./pages/ContactPage.jsx').then((module) => ({ default: module.ContactPage })));
-const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then((module) => ({ default: module.AdminPage })));
-const LoginPage = lazy(() => import('./pages/LoginPage.jsx').then((module) => ({ default: module.LoginPage })));
+const CHUNK_RELOAD_KEY = 'upay.chunkReloaded';
+
+function lazyRoute(importPage, exportName) {
+  return lazy(() =>
+    importPage()
+      .then((module) => {
+        window.sessionStorage.removeItem(CHUNK_RELOAD_KEY);
+        return { default: module[exportName] };
+      })
+      .catch((error) => {
+        const isChunkError = /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk/i.test(
+          error?.message || ''
+        );
+
+        if (isChunkError && window.sessionStorage.getItem(CHUNK_RELOAD_KEY) !== 'true') {
+          window.sessionStorage.setItem(CHUNK_RELOAD_KEY, 'true');
+          window.location.reload();
+        }
+
+        throw error;
+      })
+  );
+}
+
+const HomePage = lazyRoute(() => import('./pages/HomePage.jsx'), 'HomePage');
+const AboutPage = lazyRoute(() => import('./pages/AboutPage.jsx'), 'AboutPage');
+const ProgramsPage = lazyRoute(() => import('./pages/ProgramsPage.jsx'), 'ProgramsPage');
+const StudentsPage = lazyRoute(() => import('./pages/StudentsPage.jsx'), 'StudentsPage');
+const AttendancePage = lazyRoute(() => import('./pages/AttendancePage.jsx'), 'AttendancePage');
+const VolunteersPage = lazyRoute(() => import('./pages/VolunteersPage.jsx'), 'VolunteersPage');
+const ReportsPage = lazyRoute(() => import('./pages/ReportsPage.jsx'), 'ReportsPage');
+const GalleryPage = lazyRoute(() => import('./pages/GalleryPage.jsx'), 'GalleryPage');
+const ContactPage = lazyRoute(() => import('./pages/ContactPage.jsx'), 'ContactPage');
+const AdminPage = lazyRoute(() => import('./pages/AdminPage.jsx'), 'AdminPage');
+const LoginPage = lazyRoute(() => import('./pages/LoginPage.jsx'), 'LoginPage');
 
 function RouteLoader() {
   return (
