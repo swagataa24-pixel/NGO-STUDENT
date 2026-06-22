@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Chrome, GraduationCap, LockKeyhole, Mail, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { ArrowRight, Chrome, LockKeyhole, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import { config } from '../config.js';
 
 export function LoginPage({ activeUser, setActiveUser }) {
@@ -34,23 +34,20 @@ export function LoginPage({ activeUser, setActiveUser }) {
     <section className="section auth-section">
       <div className={`container auth-shell ${isSignup ? 'signup-mode' : 'signin-mode'}`}>
         <div className="auth-visual-panel">
+          <div className="auth-glow" aria-hidden="true" />
+          <div className="auth-rings" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
           <div className="auth-orbit" aria-hidden="true">
             <span />
             <span />
             <span />
           </div>
           <div className="auth-visual-content">
-            <span className="eyebrow">Secure UPAY workspace</span>
-            <h2>{isSignup ? 'Join the operating system behind every class.' : 'Welcome back to the education dashboard.'}</h2>
-            <p>
-              Manage attendance, student records, class reports, volunteers, and activity proof from one calm
-              role-aware workspace.
-            </p>
-            <div className="auth-mini-grid">
-              <AuthMini icon={GraduationCap} label="Classes" value="CRUD" />
-              <AuthMini icon={Users} label="Students" value="Mongo" />
-              <AuthMini icon={ShieldCheck} label="Access" value="OAuth" />
-            </div>
+            <span className="eyebrow">UPAY secure access</span>
+            <h2>{isSignup ? 'Step into the workspace.' : 'Welcome back.'}</h2>
           </div>
         </div>
 
@@ -75,13 +72,8 @@ export function LoginPage({ activeUser, setActiveUser }) {
             </div>
           ) : (
             <form className="auth-form" onSubmit={localAuth}>
-              <span className="eyebrow">{isSignup ? 'Create access' : 'Authorized login'}</span>
-              <h1>{isSignup ? 'Create your UPAY account' : 'Sign in to UPAY'}</h1>
-              <p>
-                {isSignup
-                  ? 'Request access for a center, class, or volunteer workflow.'
-                  : 'Continue with Google or use a local preview account while OAuth is being configured.'}
-              </p>
+              <span className="eyebrow">{isSignup ? 'New access' : 'Google OAuth'}</span>
+              <h1>{isSignup ? 'Create access' : 'Sign in'}</h1>
 
               {isSignup && (
                 <label>
@@ -135,23 +127,11 @@ export function LoginPage({ activeUser, setActiveUser }) {
                 {isSignup ? 'Sign up with Google' : 'Continue with Google'}
               </button>
 
-              <small>
-                Google OAuth starts on the backend and returns through the configured callback URL.
-              </small>
+              <small>Secure login through UPAY Google workspace.</small>
             </form>
           )}
         </div>
       </div>
     </section>
-  );
-}
-
-function AuthMini({ icon: Icon, label, value }) {
-  return (
-    <div className="auth-mini-card">
-      <Icon size={20} />
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
   );
 }
