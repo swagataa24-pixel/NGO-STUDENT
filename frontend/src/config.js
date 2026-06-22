@@ -1,5 +1,9 @@
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const authBaseUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+
 export const config = {
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  apiBaseUrl,
+  authBaseUrl: import.meta.env.VITE_AUTH_BASE_URL || authBaseUrl,
   appName: import.meta.env.VITE_APP_NAME || 'UPAY NGO',
   googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
   cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '',

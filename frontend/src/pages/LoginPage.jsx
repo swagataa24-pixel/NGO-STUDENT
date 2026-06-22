@@ -13,7 +13,6 @@ export function LoginPage({ activeUser, setActiveUser }) {
   });
 
   const isSignup = mode === 'signup';
-  const googleReady = Boolean(config.googleClientId);
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
 
@@ -28,17 +27,7 @@ export function LoginPage({ activeUser, setActiveUser }) {
   };
 
   const googleAuth = () => {
-    if (googleReady) {
-      window.location.href = `${config.apiBaseUrl}${config.apiRoutes.authGoogle}`;
-      return;
-    }
-
-    setActiveUser({
-      name: isSignup ? 'Google Signup Preview' : 'Google Login Preview',
-      email: isSignup ? 'signup.preview@upay.local' : 'login.preview@upay.local',
-      role: form.role || 'Teacher',
-      center: form.center
-    });
+    window.location.href = `${config.authBaseUrl}${config.apiRoutes.authGoogle}`;
   };
 
   return (
@@ -147,9 +136,7 @@ export function LoginPage({ activeUser, setActiveUser }) {
               </button>
 
               <small>
-                {googleReady
-                  ? 'Google OAuth client is configured. The button will call the backend OAuth route.'
-                  : 'Google OAuth client ID is missing, so this button uses preview login until configured.'}
+                Google OAuth starts on the backend and returns through the configured callback URL.
               </small>
             </form>
           )}

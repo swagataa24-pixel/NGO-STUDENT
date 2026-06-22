@@ -2,6 +2,7 @@ import cors from 'cors';
 import dns from 'node:dns';
 import dotenv from 'dotenv';
 import express from 'express';
+import session from 'express-session';
 import mongoose from 'mongoose';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/authRoutes.js';
@@ -11,6 +12,7 @@ import { photoRouter } from './routes/photoRoutes.js';
 import { progressRouter } from './routes/progressRoutes.js';
 import { reportRouter } from './routes/reportRoutes.js';
 import { studentRouter } from './routes/studentRoutes.js';
+import { passport } from './services/passportService.js';
 import { userRouter } from './routes/userRoutes.js';
 import { volunteerRouter } from './routes/volunteerRoutes.js';
 
@@ -54,6 +56,20 @@ app.use(
 );
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'dev-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    }
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/', (_req, res) => {
   res.json({
@@ -77,6 +93,23 @@ app.get('/api/health', (_req, res) => {
     }
   });
 });
+
+app.get(
+  '/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
+
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: 'https://ngo-student-f.onrender.com/login'
+  }),
+  (req, res) => {
+    res.redirect('https://ngo-student-f.onrender.com/dashboard');
+  }
+);
 
 function requireMongo(req, res, next) {
   if (mongoose.connection.readyState === 1) {
