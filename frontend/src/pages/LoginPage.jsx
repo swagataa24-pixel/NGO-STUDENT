@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Chrome, LockKeyhole, Mail, ShieldCheck, UserPlus } from 'lucide-react';
+import { ArrowRight, Chrome, Gauge, LockKeyhole, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import { config } from '../config.js';
 
 export function LoginPage({ activeUser, setActiveUser }) {
@@ -64,12 +64,15 @@ export function LoginPage({ activeUser, setActiveUser }) {
           <div className="auth-card">
             {activeUser ? (
               <div className="signed-in-card">
-                <ShieldCheck size={42} />
+                <div className="success-icon">
+                  <ShieldCheck size={34} />
+                </div>
+                <span className="eyebrow">Signed in</span>
                 <h3>{activeUser.name}</h3>
-                <p>{activeUser.role} access is active.</p>
-                <button className="secondary-button" onClick={() => setActiveUser(null)} type="button">
-                  Sign out
-                </button>
+                <p>{activeUser.role} access is ready.</p>
+                <a className="primary-button dashboard-button" href={config.routes.students}>
+                  <Gauge size={18} /> Go to dashboard
+                </a>
               </div>
             ) : (
               <form className="auth-form" onSubmit={localAuth}>
