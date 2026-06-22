@@ -92,9 +92,6 @@ export function GalleryPage({ photos, setPhotos }) {
             <span>Activity date</span>
             <input type="date" value={draft.date} onChange={(event) => setDraft((current) => ({ ...current, date: event.target.value }))} />
           </label>
-          <small>
-            Cloudinary readiness: {config.cloudName && config.uploadPreset ? 'configured' : 'missing public upload values'}
-          </small>
           {previewUrl && (
             <div className="soft-card" style={{ padding: '0.75rem', marginTop: '0.85rem' }}>
               <img src={previewUrl} alt="Selected upload preview" />

@@ -26,7 +26,6 @@ const publicNavItems = [
 const operationsNavItems = [
   [config.routes.students, 'Students', GraduationCap],
   [config.routes.attendance, 'Attendance', CalendarCheck],
-  [config.routes.volunteers, 'Volunteers', Users],
   [config.routes.reports, 'Reports', BarChart3],
   [config.routes.gallery, 'Gallery', Image]
 ];
@@ -61,7 +60,6 @@ export function Layout({ activeUser, onSignOut }) {
       </a>
       <header className="app-header">
         <NavLink className="brand" to={config.routes.home} onClick={() => setMenuOpen(false)} aria-label="UPAY home">
-          <span className="brand-mark">U</span>
           <span>
             <strong>UPAY</strong>
             <small>Education with dignity</small>
@@ -160,7 +158,7 @@ export function Layout({ activeUser, onSignOut }) {
             <p>Education with dignity for every child.</p>
           </div>
           <div className="footer-meta">
-            <span>© {new Date().getFullYear()} UPAY NGO. All rights reserved.</span>
+            <span className="footer-tagline">empower · educate · elevate</span>
           </div>
         </div>
       </footer>

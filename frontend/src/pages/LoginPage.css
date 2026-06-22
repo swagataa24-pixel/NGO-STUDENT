@@ -16,10 +16,10 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
-  max-width: 900px;
+  max-width: 1040px;
   margin: 0 auto;
   width: 100%;
-  animation: auth-shell-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: auth-shell-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .auth-shell.signup-mode {
@@ -154,7 +154,7 @@
 }
 
 .auth-form-panel {
-  padding: 3rem;
+  padding: clamp(3rem, 6vw, 4.5rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -325,11 +325,13 @@
 @keyframes auth-shell-rise {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(40px) scale(0.96);
+    filter: blur(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 

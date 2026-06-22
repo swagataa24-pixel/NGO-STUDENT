@@ -208,13 +208,16 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search students" />
         </label>
       </div>
-      <div className="container data-status-row">
-        <span className={dataStatus?.error ? 'data-status error' : 'data-status'}>
-          {dataStatus?.loading ? 'Loading MongoDB records...' : dataStatus?.error || 'Connected to MongoDB API'}
-        </span>
-        <button className="secondary-button" onClick={refreshData} type="button">Refresh</button>
-        {saveState && <span className="data-status">{saveState}</span>}
-      </div>
+      {(dataStatus?.loading || dataStatus?.error || saveState) && (
+        <div className="container data-status-row">
+          {(dataStatus?.loading || dataStatus?.error) && (
+            <span className={dataStatus?.error ? 'data-status error' : 'data-status'}>
+              {dataStatus?.loading ? 'Loading MongoDB records...' : dataStatus?.error}
+            </span>
+          )}
+          {saveState && <span className="data-status">{saveState}</span>}
+        </div>
+      )}
 
       <div className="container student-management-grid">
         <aside className="class-manager">

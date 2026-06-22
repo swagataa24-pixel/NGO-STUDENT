@@ -157,35 +157,46 @@
 .floating-panel {
   align-items: center;
   backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(250, 249, 246, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 3px solid var(--color-accent);
   border-radius: var(--radius);
   bottom: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  color: var(--bg-primary);
+  box-shadow: 0 20px 45px -10px rgba(18, 60, 52, 0.15);
+  color: var(--text-primary);
   display: flex;
-  gap: 0.75rem;
+  gap: 0.8rem;
   left: 2rem;
-  padding: 0.8rem 1.3rem;
+  padding: 0.65rem 1.2rem;
   position: absolute;
   z-index: 4;
   animation: floating-panel-rise 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .floating-panel svg {
-  color: var(--color-accent);
+  display: none !important; /* Hide icon completely as requested */
 }
 
 .floating-panel strong {
-  font-size: 0.88rem;
-  font-weight: 600;
-  display: block;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+  display: inline-block;
+  line-height: 1;
 }
 
 .floating-panel span {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  padding-left: 0.8rem;
+  line-height: 1;
+  display: inline-block;
 }
 
 /* Workflow grid */

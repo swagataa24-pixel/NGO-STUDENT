@@ -4,13 +4,89 @@
   display: grid;
   gap: 2rem;
   grid-template-columns: 320px minmax(0, 1fr);
-  align-items: start;
+  align-items: stretch; /* Stretch children so empty state height matches form card */
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2rem 1.8rem;
+  align-self: start;
+}
+
+.form-card h3 {
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 0.8rem;
+}
+
+.form-card label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.form-card label span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+/* Custom premium file selector input styling */
+.form-card input[type="file"] {
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-primary);
+  cursor: pointer;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  width: 100%;
+}
+
+.form-card input[type="file"]::file-selector-button {
+  background: var(--color-primary);
+  border: none;
+  color: var(--bg-primary);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background-color 200ms ease;
+}
+
+.form-card input[type="file"]::file-selector-button:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Make empty state fill the right-side grid container nicely when no photos exist */
+.gallery-layout .empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 480px;
 }
 
 .gallery-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-self: start;
 }
 
 .photo-card {
@@ -63,5 +139,10 @@ figcaption span {
 @media (max-width: 1040px) {
   .gallery-layout {
     grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  
+  .gallery-layout .empty-state {
+    min-height: 300px;
   }
 }

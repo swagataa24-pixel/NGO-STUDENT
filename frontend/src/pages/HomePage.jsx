@@ -79,9 +79,6 @@ export function HomePage() {
             <span className="eyebrow">Our Collective Purpose</span>
             <h2>Every lesson taught, attendance recorded, and progress evaluated is a direct investment in a child’s future.</h2>
           </div>
-          <Link className="secondary-button" to={config.routes.volunteers}>
-            <Users size={18} /> View volunteers
-          </Link>
         </div>
       </section>
     </>
