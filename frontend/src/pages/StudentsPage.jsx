@@ -39,7 +39,7 @@ const emptyClass = {
   description: ''
 };
 
-export function StudentsPage({ students, setStudents, classes, setClasses, dataStatus, refreshData }) {
+export function StudentsPage({ students, setStudents, classes, setClasses, dataStatus, refreshData, volunteers = [] }) {
   const [query, setQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState(classes[0] ? mongoId(classes[0]) : 'all');
   const [studentForm, setStudentForm] = useState(emptyStudent);
@@ -261,8 +261,23 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
               <input value={classForm.name} onChange={(event) => setClassForm((current) => ({ ...current, name: event.target.value }))} placeholder="Class 5" />
             </label>
             <label>
-              <span>Teacher</span>
-              <input value={classForm.teacher} onChange={(event) => setClassForm((current) => ({ ...current, teacher: event.target.value }))} />
+              <span>Teacher / Volunteer</span>
+              <input
+                list="volunteer-teacher-options"
+                value={classForm.teacher}
+                onChange={(event) => setClassForm((current) => ({ ...current, teacher: event.target.value }))}
+                placeholder={volunteers.length ? 'Select or type volunteer name' : 'Teacher name'}
+              />
+              {volunteers.length > 0 && (
+                <datalist id="volunteer-teacher-options">
+                  {volunteers.map((volunteer) => (
+                    <option key={mongoId(volunteer)} value={volunteer.name} />
+                  ))}
+                </datalist>
+              )}
+              {volunteers.length > 0 && (
+                <small className="field-hint">Pick from registered volunteers so they appear under Manage Volunteers.</small>
+              )}
             </label>
             <label>
               <span>Schedule</span>

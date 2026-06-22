@@ -40,6 +40,12 @@
   letter-spacing: -0.01em;
 }
 
+.field-hint {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
 .class-list-heading span,
 .form-title-row span {
   background: var(--bg-tint);

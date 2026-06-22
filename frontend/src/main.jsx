@@ -105,12 +105,34 @@ function decodeAuthUser(encodedUser) {
   return JSON.parse(window.atob(padded));
 }
 
+function readStoredSession() {
+  try {
+    const token = window.localStorage.getItem('upay.authToken');
+    const storedUser = window.localStorage.getItem('upay.activeUser');
+    if (token && storedUser) {
+      return JSON.parse(storedUser);
+    }
+    if (!token && storedUser) {
+      window.localStorage.removeItem('upay.activeUser');
+    }
+  } catch {
+    window.localStorage.removeItem('upay.authToken');
+    window.localStorage.removeItem('upay.activeUser');
+  }
+  return null;
+}
+
+function clearStoredSession() {
+  window.localStorage.removeItem('upay.authToken');
+  window.localStorage.removeItem('upay.activeUser');
+}
+
 function App() {
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [photos, setPhotos] = useState([]);
-  const [activeUser, setActiveUser] = useState(null);
+  const [activeUser, setActiveUser] = useState(readStoredSession);
   const [dataStatus, setDataStatus] = useState({ loading: true, error: '' });
 
   useEffect(() => {
@@ -125,19 +147,9 @@ function App() {
         window.localStorage.setItem('upay.activeUser', JSON.stringify(user));
         setActiveUser(user);
         window.history.replaceState({}, document.title, window.location.pathname);
-        return;
       } catch {
-        window.localStorage.removeItem('upay.authToken');
-        window.localStorage.removeItem('upay.activeUser');
-      }
-    }
-
-    const storedUser = window.localStorage.getItem('upay.activeUser');
-    if (storedUser) {
-      try {
-        setActiveUser(JSON.parse(storedUser));
-      } catch {
-        window.localStorage.removeItem('upay.activeUser');
+        clearStoredSession();
+        setActiveUser(null);
       }
     }
   }, []);
@@ -145,11 +157,13 @@ function App() {
   useEffect(() => {
     if (activeUser) {
       window.localStorage.setItem('upay.activeUser', JSON.stringify(activeUser));
-    } else {
-      window.localStorage.removeItem('upay.activeUser');
-      window.localStorage.removeItem('upay.authToken');
     }
   }, [activeUser]);
+
+  const handleSignOut = () => {
+    clearStoredSession();
+    setActiveUser(null);
+  };
 
   const refreshData = async () => {
     setDataStatus({ loading: true, error: '' });
@@ -182,7 +196,7 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<RouteLoader />}>
         <Routes>
-          <Route element={<Layout activeUser={activeUser} onSignOut={() => setActiveUser(null)} />}>
+          <Route element={<Layout activeUser={activeUser} onSignOut={handleSignOut} />}>
             <Route index element={<HomePage />} />
             <Route path={config.routes.about.replace(/^\//, '')} element={<AboutPage />} />
             <Route path={config.routes.programs.replace(/^\//, '')} element={<ProgramsPage />} />
@@ -195,6 +209,7 @@ function App() {
                     setStudents={setStudents}
                     classes={classes}
                     setClasses={setClasses}
+                    volunteers={volunteers}
                     dataStatus={dataStatus}
                     refreshData={refreshData}
                   />
@@ -218,6 +233,8 @@ function App() {
                     setVolunteers={setVolunteers}
                     students={students}
                     classes={classes}
+                    dataStatus={dataStatus}
+                    refreshData={refreshData}
                   />
                 </AccessRoute>
               }
@@ -235,7 +252,15 @@ function App() {
               path={config.routes.admin.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin']}>
-                  <AdminPage students={students} photos={photos} activeUser={activeUser} />
+                  <AdminPage
+                    students={students}
+                    classes={classes}
+                    volunteers={volunteers}
+                    photos={photos}
+                    activeUser={activeUser}
+                    dataStatus={dataStatus}
+                    refreshData={refreshData}
+                  />
                 </AccessRoute>
               }
             />

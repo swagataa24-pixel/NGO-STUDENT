@@ -27,6 +27,7 @@ export const config = {
     classes: import.meta.env.VITE_API_CLASSES_PATH || '/classes',
     photos: import.meta.env.VITE_API_PHOTOS_PATH || '/photos',
     volunteers: import.meta.env.VITE_API_VOLUNTEERS_PATH || '/volunteers',
+    users: import.meta.env.VITE_API_USERS_PATH || '/users',
     attendanceSession: import.meta.env.VITE_API_ATTENDANCE_SESSION_PATH || '/attendance/session',
     authGoogle: import.meta.env.VITE_API_AUTH_GOOGLE_PATH || '/auth/google'
   }
