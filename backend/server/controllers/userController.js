@@ -13,6 +13,21 @@ export async function index(_req, res, next) {
 export async function updateRole(req, res, next) {
   try {
     assertAllowedRole(req.body.role);
+
+    if (req.body.role === 'Admin') {
+      const userToUpdate = await User.findById(req.params.id);
+      if (!userToUpdate) throw httpError(404, 'User not found.');
+
+      const adminEmails = (process.env.ADMIN_EMAILS || '')
+        .split(',')
+        .map((email) => email.trim().toLowerCase())
+        .filter(Boolean);
+
+      if (!adminEmails.includes(userToUpdate.email.trim().toLowerCase())) {
+        throw httpError(403, 'This user email is not authorized as an Admin in server configuration.');
+      }
+    }
+
     const user = await User.findByIdAndUpdate(req.params.id, { role: req.body.role }, { new: true, runValidators: true });
     if (!user) throw httpError(404, 'User not found.');
     res.json(user);

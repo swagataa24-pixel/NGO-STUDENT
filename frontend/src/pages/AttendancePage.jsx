@@ -406,7 +406,6 @@ function AttendanceDeck({ student, mark, disabled }) {
           <h3>{student.name}</h3>
           <p>{student.className} · Age {student.age}</p>
           <dl>
-            <div><dt>Center</dt><dd>{student.center}</dd></div>
             <div><dt>Guardian</dt><dd>{student.guardianName}</dd></div>
             <div><dt>Last note</dt><dd>{student.note}</dd></div>
           </dl>
@@ -427,11 +426,10 @@ function AttendanceDeck({ student, mark, disabled }) {
 function AttendanceReviewTable({ rows, updateRecord, locked }) {
   return (
     <ResponsiveTable
-      headers={['Student', 'Class', 'Center', 'Status', 'Edit']}
+      headers={['Student', 'Class', 'Status', 'Edit']}
       rows={rows.map(({ student, status }) => [
         student?.name || 'Unknown student',
         student?.className || '-',
-        student?.center || '-',
         status === 'present' ? 'Present' : 'Absent',
         <div className="segmented-status" key={mongoId(student)}>
           <button

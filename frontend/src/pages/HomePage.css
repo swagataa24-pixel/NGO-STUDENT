@@ -73,7 +73,7 @@
   animation: text-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
 }
 
-/* Luxury visual card with image hidden, replacing with gorgeous animated mesh background */
+/* Luxury visual card with premium image & editorial overlay */
 .hero-visual {
   animation: hero-visual-reveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   border-radius: var(--radius-lg);
@@ -99,11 +99,39 @@
   background: radial-gradient(circle at 70% 80%, rgba(166, 141, 113, 0.22) 0%, transparent 50%),
               radial-gradient(circle at 10% 20%, rgba(29, 84, 73, 0.45) 0%, transparent 60%);
   animation: hero-glow-drift 15s ease-in-out infinite alternate;
-  z-index: 1;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 41, 35, 0.25) 0%,
+    rgba(12, 41, 35, 0.85) 100%
+  );
+  z-index: 3;
+  pointer-events: none;
 }
 
 .hero-visual img {
-  display: none !important; /* Hide image completely */
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  opacity: 0.65;
+  mix-blend-mode: luminosity;
+  transition: transform 3s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: contrast(1.15) brightness(0.85) sepia(0.05);
+}
+
+.hero-visual:hover img {
+  transform: scale(1.05);
 }
 
 .hero-visual-glow {
@@ -129,7 +157,7 @@
   line-height: 0.85;
   text-align: right;
   text-transform: lowercase;
-  z-index: 3;
+  z-index: 4;
   color: var(--bg-primary);
   opacity: 0.8;
   letter-spacing: -0.02em;
@@ -313,17 +341,24 @@
 }
 
 @keyframes kinetic-word-in {
-  0%, 100% {
+  0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px) scale(0.92);
+    filter: blur(12px);
+    letter-spacing: 0.05em;
   }
-  5%, 30% {
-    opacity: 0.9;
-    transform: translateY(0);
+  5%, 28% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    letter-spacing: -0.02em;
+    color: var(--color-accent);
   }
-  35%, 95% {
+  33%, 100% {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-20px) scale(1.08);
+    filter: blur(12px);
+    letter-spacing: -0.05em;
   }
 }
 

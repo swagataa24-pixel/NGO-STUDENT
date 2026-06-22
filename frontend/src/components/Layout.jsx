@@ -152,13 +152,35 @@ export function Layout({ activeUser, onSignOut }) {
         <Outlet />
       </main>
       <footer className="app-footer">
-        <div className="container footer-content">
-          <div className="footer-brand">
-            <strong>UPAY</strong>
-            <p>Education with dignity for every child.</p>
+        <div className="container footer-grid">
+          <div className="footer-brand-section">
+            <strong className="footer-title">UPAY</strong>
+            <p className="footer-desc">Restoring the promise of childhood by providing structured education, equal opportunities, and compassionate care to underserved communities.</p>
           </div>
-          <div className="footer-meta">
-            <span className="footer-tagline">empower · educate · elevate</span>
+
+          <div className="footer-links-section">
+            <h4>Quick Links</h4>
+            <div className="footer-links">
+              <NavLink to={config.routes.home}>Home</NavLink>
+              <NavLink to={config.routes.about}>Our Story</NavLink>
+              <NavLink to={config.routes.programs}>Programs</NavLink>
+              <NavLink to={config.routes.gallery}>Gallery</NavLink>
+            </div>
+          </div>
+
+          <div className="footer-accent-section">
+            <span className="footer-tagline-sexy">
+              <span>empower</span>
+              <span className="bullet">·</span>
+              <span>educate</span>
+              <span className="bullet">·</span>
+              <span>elevate</span>
+            </span>
+          </div>
+        </div>
+        <div className="footer-bottom-bar">
+          <div className="container">
+            <p>Designed with absolute dedication to child development and grassroots community support.</p>
           </div>
         </div>
       </footer>

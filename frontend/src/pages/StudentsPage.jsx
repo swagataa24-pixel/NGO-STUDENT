@@ -242,7 +242,7 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                     <Users size={18} />
                     <span>
                       <strong>{classItem.name}</strong>
-                      <small>{classItem.center} · {count} students</small>
+                      <small>{count} students</small>
                     </span>
                   </button>
                   <div className="class-row-actions">
@@ -259,10 +259,6 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
             <label>
               <span>Class name</span>
               <input value={classForm.name} onChange={(event) => setClassForm((current) => ({ ...current, name: event.target.value }))} placeholder="Class 5" />
-            </label>
-            <label>
-              <span>Center</span>
-              <input value={classForm.center} onChange={(event) => setClassForm((current) => ({ ...current, center: event.target.value }))} placeholder="Kumbhari Reach and Teach" />
             </label>
             <label>
               <span>Teacher</span>
@@ -398,12 +394,16 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
 function ClassSummary({ classRecord, students, allSelected }) {
   const average =
     students.reduce((sum, student) => sum + percent(student), 0) / Math.max(students.length, 1);
+
+
+
+
   return (
     <div className="class-summary-card">
       <div>
-        <span className="eyebrow">{allSelected ? 'All classes' : classRecord?.center || 'Class'}</span>
+        <span className="eyebrow">{allSelected ? 'All classes' : 'Class'}</span>
         <h3>{allSelected ? 'Complete student database' : classRecord?.name}</h3>
-        <p>{allSelected ? 'Review all enrolled students across centers.' : classRecord?.description}</p>
+        <p>{allSelected ? 'Review all enrolled students.' : classRecord?.description}</p>
       </div>
       <div className="class-summary-stats">
         <strong>{students.length}</strong>
@@ -424,7 +424,7 @@ function ClassRoster({ className, students, onView, onEdit, onDelete }) {
         <h3>{className}</h3>
         <span>{students.length} students</span>
       </div>
-      <div className="class-student-grid">
+      <div className="student-grid">
         {students.map((student) => (
           <StudentCard
             key={mongoId(student)}
@@ -451,7 +451,7 @@ function StudentCard({ student, onView, onEdit, onDelete }) {
           <h3>{student.name}</h3>
           <StatusBadge value={value} />
         </div>
-        <p>{student.className} · {student.center}</p>
+        <p>{student.className}</p>
         <small>Guardian: {student.guardianName} · {student.guardianContact}</small>
         <div className="note-list">
           {notes.slice(-2).map((note, index) => (
@@ -488,9 +488,7 @@ function StudentDetailPanel({
   const isEditing = Boolean(editingStudent);
   const data = editingStudent || student;
   const value = percent(student);
-
-  const update = (field, value) => setEditingStudent((current) => ({ ...current, [field]: value }));
-
+  const update = (field, val) => setEditingStudent((current) => ({ ...current, [field]: val }));
   return (
     <div className="drawer-backdrop" role="presentation">
       <aside className="student-drawer" aria-label={`${student.name} details`}>
@@ -510,7 +508,7 @@ function StudentDetailPanel({
           <form className="drawer-form" onSubmit={onSave}>
             <div className="drawer-summary">
               <StatusBadge value={value} />
-              <p>{student.className} · {student.center}</p>
+              <p>{student.className}</p>
             </div>
             <div className="form-grid">
               <label><span>Name</span><input value={data.name} onChange={(event) => update('name', event.target.value)} /></label>
@@ -528,7 +526,7 @@ function StudentDetailPanel({
                 <span>Class</span>
                 <select value={data.classId || ''} onChange={(event) => update('classId', event.target.value)}>
                   {classes.map((classItem) => (
-                    <option value={mongoId(classItem)} key={mongoId(classItem)}>{classItem.name} · {classItem.center}</option>
+                    <option value={mongoId(classItem)} key={mongoId(classItem)}>{classItem.name}</option>
                   ))}
                 </select>
               </label>
@@ -547,11 +545,10 @@ function StudentDetailPanel({
           <>
           <div className="drawer-summary">
             <StatusBadge value={value} />
-            <p>{student.className} · {student.center} · Enrolled {student.enrollmentDate || '-'}</p>
+            <p>{student.className} · Enrolled {student.enrollmentDate || '-'}</p>
           </div>
           <div className="detail-grid">
             <Detail label="Class" value={student.className} />
-            <Detail label="Center" value={student.center} />
             <Detail label="Age" value={student.age || '-'} />
             <Detail label="Gender" value={student.gender || '-'} />
             <Detail label="Guardian" value={student.guardianName || '-'} />

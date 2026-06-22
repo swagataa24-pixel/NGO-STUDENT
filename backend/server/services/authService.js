@@ -15,11 +15,24 @@ function normalizeEmail(email) {
 }
 
 function normalizeRole(role, email) {
-  if (role && ['Admin', 'Teacher', 'Volunteer', 'Viewer'].includes(role)) {
+  const adminEmails = parseAdminEmails();
+  const isEmailAdmin = adminEmails.includes(normalizeEmail(email));
+
+  if (isEmailAdmin) {
+    return 'Admin';
+  }
+
+  // If the email is not in the ADMIN_EMAILS list, they can NEVER be Admin.
+  // Fall back to defaultRole ('Teacher') if they have or request 'Admin'
+  if (role === 'Admin') {
+    return defaultRole;
+  }
+
+  if (role && ['Teacher', 'Volunteer', 'Viewer'].includes(role)) {
     return role;
   }
 
-  return parseAdminEmails().includes(normalizeEmail(email)) ? 'Admin' : defaultRole;
+  return defaultRole;
 }
 
 function buildFallbackUser(profile = {}) {

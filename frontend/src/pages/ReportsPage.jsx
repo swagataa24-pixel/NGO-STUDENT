@@ -63,13 +63,10 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         <div>
           <span className="eyebrow">Analytics</span>
           <h2>Consolidated operational reviews, attendance metrics, and compliance audits.</h2>
-          <p>Specify month, center, and class scope to export audited PDF reports and view administrative data tables.</p>
+          <p>Specify month and class scope to export audited PDF reports and view administrative data tables.</p>
         </div>
         <div className="filter-bar">
           <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />
-          <select value={center} onChange={(event) => setCenter(event.target.value)}>
-            {centers.map((item) => <option key={item} value={item}>{item === 'all' ? 'All centers' : item}</option>)}
-          </select>
           <select value={className} onChange={(event) => setClassName(event.target.value)}>
             {classOptions.map((item) => <option key={item} value={item}>{item === 'all' ? 'All classes' : item}</option>)}
           </select>
@@ -120,13 +117,12 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
           <h3>Student Attendance Table</h3>
           {filteredStudents.length ? (
             <ResponsiveTable
-              headers={['Student', 'Class', 'Center', 'Attended', 'Total Classes', 'Attendance', 'Status']}
+              headers={['Student', 'Class', 'Attended', 'Total Classes', 'Attendance', 'Status']}
               rows={filteredStudents.map((student) => {
                 const value = percent(student);
                 return [
                   student.name,
                   student.className,
-                  student.center,
                   student.attended,
                   student.conducted,
                   `${value}%`,
@@ -156,11 +152,10 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
           <div className="table-card">
             <h3>Volunteer Contribution Table</h3>
             <ResponsiveTable
-              headers={['Volunteer', 'Role', 'Center', 'Availability', 'Hours']}
+              headers={['Volunteer', 'Role', 'Availability', 'Hours']}
               rows={volunteers.map((volunteer) => [
                 volunteer.name,
                 volunteer.role,
-                volunteer.center || volunteer.assignedCenter,
                 volunteer.availability,
                 `${volunteer.hours || volunteer.activityLogs?.reduce((sum, item) => sum + (item.hours || 0), 0) || 0}h`
               ])}
@@ -171,10 +166,9 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
           <div className="table-card">
             <h3>Activity Photo Proof Table</h3>
             <ResponsiveTable
-              headers={['Date', 'Center', 'Activity', 'Caption', 'Image']}
+              headers={['Date', 'Activity', 'Caption', 'Image']}
               rows={filteredPhotos.map((photo) => [
                 photoDate(photo),
-                photoCenter(photo),
                 photoActivity(photo),
                 photo.caption || '-',
                 <button className="secondary-button compact-button" onClick={() => setPreviewPhoto(photo)} type="button" key={photo.id || photo._id}>
@@ -195,7 +189,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
             <img src={previewPhoto.imageUrl} alt={previewPhoto.caption || 'Linked class proof'} />
             <div>
               <strong>{previewPhoto.caption || 'Linked class proof'}</strong>
-              <span>{photoCenter(previewPhoto)} / {photoDate(previewPhoto)}</span>
+              <span>{photoDate(previewPhoto)}</span>
             </div>
           </div>
         </div>
