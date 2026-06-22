@@ -9,6 +9,7 @@ import {
   Home,
   Image,
   LogIn,
+  LogOut,
   Menu,
   Settings,
   Users,
@@ -30,11 +31,6 @@ const operationsNavItems = [
   [config.routes.gallery, 'Gallery', Image]
 ];
 
-const systemNavItems = [
-  [config.routes.admin, 'Admin', Settings],
-  [config.routes.login, 'Login', LogIn]
-];
-
 const roleRank = { Viewer: 0, Volunteer: 1, Teacher: 2, Admin: 3 };
 
 function canSee(role, minimumRole) {
@@ -51,7 +47,6 @@ export function Layout({ activeUser, onSignOut }) {
 
   const visiblePublicNavItems = publicNavItems;
   const visibleOperationsNavItems = showOperations ? operationsNavItems : [];
-  const visibleSystemNavItems = showSystem ? systemNavItems : [[config.routes.login, 'Login', LogIn]];
 
   return (
     <>
@@ -76,6 +71,12 @@ export function Layout({ activeUser, onSignOut }) {
                 <span>{activeUser.name}</span>
               </button>
               <div className="nav-group-menu compact user-profile-menu">
+                {showSystem && (
+                  <NavLink to={config.routes.admin} className="profile-menu-item" onClick={() => setMenuOpen(false)}>
+                    <Settings size={14} />
+                    Admin Settings
+                  </NavLink>
+                )}
                 <button className="secondary-button header-signout" type="button" onClick={onSignOut}>
                   Sign out
                 </button>
@@ -126,24 +127,44 @@ export function Layout({ activeUser, onSignOut }) {
               </div>
             </div>
           )}
-          <div className="nav-group" data-open={openGroup === 'system'}>
+          <div className="nav-group" data-open={openGroup === 'account'}>
             <button
               type="button"
               className="nav-group-trigger"
-              aria-expanded={openGroup === 'system'}
-              aria-controls="system-menu"
-              onClick={() => setOpenGroup((current) => (current === 'system' ? null : 'system'))}
+              aria-expanded={openGroup === 'account'}
+              aria-controls="account-menu"
+              onClick={() => setOpenGroup((current) => (current === 'account' ? null : 'account'))}
             >
-              <Settings size={16} />
-              System
+              <Users size={16} />
+              {isSignedIn ? activeUser.name : 'Account'}
             </button>
-            <div id="system-menu" className="nav-group-menu compact">
-              {visibleSystemNavItems.map(([to, label, Icon]) => (
-                <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>
-                  <Icon size={16} />
-                  {label}
+            <div id="account-menu" className="nav-group-menu compact">
+              {showSystem && (
+                <NavLink key={config.routes.admin} to={config.routes.admin} onClick={() => { setMenuOpen(false); setOpenGroup(null); }}>
+                  <Settings size={16} />
+                  Admin
                 </NavLink>
-              ))}
+              )}
+              {isSignedIn ? (
+                <button
+                  key="logout"
+                  className="nav-action-link"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setOpenGroup(null);
+                    onSignOut();
+                  }}
+                  type="button"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              ) : (
+                <NavLink key={config.routes.login} to={config.routes.login} onClick={() => { setMenuOpen(false); setOpenGroup(null); }}>
+                  <LogIn size={16} />
+                  Login
+                </NavLink>
+              )}
             </div>
           </div>
         </nav>

@@ -137,6 +137,27 @@
   border-color: var(--risk-fg);
 }
 
+.profile-menu-item {
+  align-items: center;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  display: inline-flex;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.5rem 0.8rem;
+  width: 100%;
+  margin-bottom: 0.25rem;
+  transition: all 180ms ease;
+  justify-content: flex-start;
+  text-decoration: none;
+}
+
+.profile-menu-item:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.02);
+}
+
 .login-nav-button {
   min-height: 36px;
   padding: 0.45rem 1rem;
@@ -170,6 +191,7 @@
 }
 
 .nav a,
+.nav button,
 .nav-group-trigger {
   align-items: center;
   border-radius: var(--radius);
@@ -184,9 +206,14 @@
   border: 1px solid transparent;
   width: 100%;
   justify-content: flex-start;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
 }
 
 .nav a:hover,
+.nav button:hover,
 .nav-group-trigger:hover {
   color: var(--text-primary);
   background: rgba(0, 0, 0, 0.02);
