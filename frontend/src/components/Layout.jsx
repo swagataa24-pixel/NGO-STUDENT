@@ -31,7 +31,7 @@ const operationsNavItems = [
   [config.routes.gallery, 'Gallery', Image]
 ];
 
-const roleRank = { Viewer: 0, Volunteer: 1, Teacher: 2, Admin: 3 };
+const roleRank = { Viewer: 0, Teacher: 1, Admin: 2 };
 
 function canSee(role, minimumRole) {
   return roleRank[role || 'Viewer'] >= roleRank[minimumRole];
@@ -42,7 +42,7 @@ export function Layout({ activeUser, onSignOut }) {
   const [openGroup, setOpenGroup] = useState(null);
   const role = activeUser?.role || 'Viewer';
   const isSignedIn = Boolean(activeUser);
-  const showOperations = canSee(role, 'Volunteer');
+  const showOperations = canSee(role, 'Teacher');
   const showSystem = canSee(role, 'Admin');
 
   const visiblePublicNavItems = publicNavItems;
@@ -127,46 +127,6 @@ export function Layout({ activeUser, onSignOut }) {
               </div>
             </div>
           )}
-          <div className="nav-group" data-open={openGroup === 'account'}>
-            <button
-              type="button"
-              className="nav-group-trigger"
-              aria-expanded={openGroup === 'account'}
-              aria-controls="account-menu"
-              onClick={() => setOpenGroup((current) => (current === 'account' ? null : 'account'))}
-            >
-              <Users size={16} />
-              {isSignedIn ? activeUser.name : 'Account'}
-            </button>
-            <div id="account-menu" className="nav-group-menu compact">
-              {showSystem && (
-                <NavLink key={config.routes.admin} to={config.routes.admin} onClick={() => { setMenuOpen(false); setOpenGroup(null); }}>
-                  <Settings size={16} />
-                  Admin
-                </NavLink>
-              )}
-              {isSignedIn ? (
-                <button
-                  key="logout"
-                  className="nav-action-link"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setOpenGroup(null);
-                    onSignOut();
-                  }}
-                  type="button"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              ) : (
-                <NavLink key={config.routes.login} to={config.routes.login} onClick={() => { setMenuOpen(false); setOpenGroup(null); }}>
-                  <LogIn size={16} />
-                  Login
-                </NavLink>
-              )}
-            </div>
-          </div>
         </nav>
       </header>
       <main className="page-shell" id="main-content" tabIndex={-1}>

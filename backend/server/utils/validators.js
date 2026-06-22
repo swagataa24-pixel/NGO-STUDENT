@@ -1,6 +1,6 @@
 import { httpError } from './httpError.js';
 
-export const allowedUserRoles = ['Admin', 'Teacher', 'Volunteer', 'Viewer'];
+export const allowedUserRoles = ['Admin', 'Teacher', 'Viewer'];
 
 export function assertAllowedRole(role) {
   if (!allowedUserRoles.includes(role)) {

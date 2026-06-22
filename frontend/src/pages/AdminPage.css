@@ -79,3 +79,169 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── User Management ── */
+.user-mgmt-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.user-mgmt-title {
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0.3rem 0 0;
+}
+
+.users-state {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  padding: 1rem 0;
+}
+
+.users-state.error { color: var(--risk-fg, #c5221f); }
+
+.users-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  background: var(--bg-secondary);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.users-table th {
+  background: rgba(18, 60, 52, 0.04);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+.users-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  vertical-align: middle;
+}
+
+.users-table tr:last-child td { border-bottom: none; }
+
+.row-blocked td { opacity: 0.55; }
+.row-blocked td:last-child { opacity: 1; }
+
+.user-name  { font-weight: 600; color: var(--text-primary); }
+.user-email { color: var(--text-secondary); font-size: 0.82rem; }
+
+.users-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem 1rem !important;
+}
+
+/* Role select */
+.role-select {
+  border: 1.5px solid rgba(0, 0, 0, 0.09);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  min-width: 90px;
+  transition: border-color 0.2s ease;
+}
+
+.role-select:focus { border-color: var(--color-primary); }
+.role-select:disabled { opacity: 0.6; cursor: default; }
+
+/* Status badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.active  { background: rgba(19, 115, 51, 0.1);   color: #137333; }
+.status-badge.blocked { background: rgba(197, 34, 31, 0.1);   color: #c5221f; }
+
+/* Inline edit inputs */
+.inline-edit {
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.84rem;
+  font-family: inherit;
+  width: 100%;
+  min-width: 110px;
+  outline: none;
+  background: var(--bg-primary);
+}
+
+/* Action buttons */
+.action-btns {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.act-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  transition: all 180ms ease;
+}
+
+.act-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.act-btn.edit    { color: var(--text-secondary); }
+.act-btn.edit:hover:not(:disabled) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+
+.act-btn.save    { color: #137333; }
+.act-btn.save:hover:not(:disabled) { background: rgba(19,115,51,0.08); }
+
+.act-btn.cancel  { color: var(--text-muted); }
+.act-btn.cancel:hover { background: rgba(0,0,0,0.04); color: var(--text-primary); }
+
+.act-btn.block   { color: #b06000; }
+.act-btn.block:hover:not(:disabled) { background: rgba(176,96,0,0.1); }
+
+.act-btn.unblock { color: #137333; }
+.act-btn.unblock:hover:not(:disabled) { background: rgba(19,115,51,0.1); }
+
+.act-btn.delete  { color: var(--risk-fg, #c5221f); }
+.act-btn.delete:hover:not(:disabled) { background: rgba(197,34,31,0.08); }
+
+@media (max-width: 768px) {
+  .users-table th, .users-table td { padding: 0.65rem 0.7rem; }
+  .user-email { display: none; }
+}
+
