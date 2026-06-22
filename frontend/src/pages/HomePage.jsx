@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, BookOpen, CalendarCheck, Camera, GraduationCap, Sparkles, Users } from 'lucide-react';
-import { Metric } from '../components/Metric.jsx';
 import { config } from '../config.js';
 
-export function HomePage({ stats }) {
+const marqueeWords = ['Education', 'Dignity', 'Care', 'Access', 'Mentorship', 'Trust'];
+
+export function HomePage() {
   const workflows = [
     [CalendarCheck, 'Daily attendance', 'Move through each class quickly and save present or absent marks with one clear action.', config.routes.attendance],
     [GraduationCap, 'Student records', 'Keep learner profiles, guardian details, notes, and attendance patterns in one place.', config.routes.students],
@@ -14,14 +15,18 @@ export function HomePage({ stats }) {
   return (
     <>
       <section className="section hero-section">
+        <div className="hero-marquee" aria-hidden="true">
+          <div>
+            {[...marqueeWords, ...marqueeWords].map((word, index) => (
+              <span key={`${word}-${index}`}>{word}</span>
+            ))}
+          </div>
+        </div>
         <div className="container hero-grid">
           <div className="hero-copy">
             <span className="eyebrow">Reach and Teach since 2010</span>
-            <h1>Every child deserves childhood, education, and a fair chance to grow.</h1>
-            <p>
-              UPAY combines its public story and internal operations into one clear platform for attendance,
-              progress tracking, photo proof, volunteers, and monthly reporting.
-            </p>
+            <h1>Childhood should feel possible.</h1>
+            <p>UPAY brings learning, care, and opportunity closer to children who deserve a fair start.</p>
             <div className="button-row">
               <Link className="primary-button" to={config.routes.attendance}>
                 <CalendarCheck size={18} /> Start attendance
@@ -32,22 +37,22 @@ export function HomePage({ stats }) {
             </div>
           </div>
           <div className="hero-visual" aria-label="Children learning together">
+            <div className="hero-visual-glow" aria-hidden="true" />
+            <div className="hero-kinetic-text" aria-hidden="true">
+              <span>learn</span>
+              <span>grow</span>
+              <span>belong</span>
+            </div>
             <img
               src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80"
               alt="Children studying in a classroom"
             />
             <div className="floating-panel">
               <Sparkles size={20} />
-              <strong>{stats.average}%</strong>
-              <span>average attendance</span>
+              <strong>Every day counts</strong>
+              <span>learning with care</span>
             </div>
           </div>
-        </div>
-        <div className="container impact-strip">
-          <Metric value={`${stats.students}+`} label="active students" />
-          <Metric value={stats.centers} label="centers tracked" />
-          <Metric value={stats.volunteers} label="volunteers" />
-          <Metric value={stats.reports} label="monthly reports" />
         </div>
       </section>
 
