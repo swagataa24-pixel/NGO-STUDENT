@@ -212,8 +212,13 @@ function App() {
             <Route
               path={config.routes.volunteers.replace(/^\//, '')}
               element={
-                <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
-                  <VolunteersPage volunteers={volunteers} />
+                <AccessRoute activeUser={activeUser} allowedRoles={['Admin']}>
+                  <VolunteersPage
+                    volunteers={volunteers}
+                    setVolunteers={setVolunteers}
+                    students={students}
+                    classes={classes}
+                  />
                 </AccessRoute>
               }
             />

@@ -88,11 +88,13 @@
   transition: transform 200ms ease;
 }
 
-.user-profile-group:hover .user-profile-trigger::after {
+.user-profile-group:hover .user-profile-trigger::after,
+.user-profile-group[data-open="true"] .user-profile-trigger::after {
   transform: translateY(1px) rotate(-135deg);
 }
 
-.user-profile-group:hover .user-profile-trigger {
+.user-profile-group:hover .user-profile-trigger,
+.user-profile-group[data-open="true"] .user-profile-trigger {
   border-color: var(--text-primary);
   background: var(--bg-secondary);
 }
@@ -114,13 +116,15 @@
   z-index: 30;
 }
 
-.user-profile-group:hover .user-profile-menu {
+.user-profile-group:hover .user-profile-menu,
+.user-profile-group[data-open="true"] .user-profile-menu {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
 }
 
-.header-signout {
+.header-signout,
+.profile-signout {
   width: 100%;
   min-height: 34px;
   padding: 0.45rem 0.8rem;
@@ -130,9 +134,16 @@
   letter-spacing: 0.05em;
   border-color: rgba(200, 30, 30, 0.15);
   color: var(--risk-fg);
+  background: transparent;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
 }
 
-.header-signout:hover {
+.header-signout:hover,
+.profile-signout:hover {
   background: var(--risk-bg);
   border-color: var(--risk-fg);
 }

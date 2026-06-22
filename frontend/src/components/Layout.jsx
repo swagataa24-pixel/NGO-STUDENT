@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
   BookOpen,
@@ -8,7 +8,6 @@ import {
   HeartHandshake,
   Home,
   Image,
-  LogIn,
   LogOut,
   Menu,
   Settings,
@@ -31,6 +30,8 @@ const operationsNavItems = [
   [config.routes.gallery, 'Gallery', Image]
 ];
 
+const adminOperationsNavItems = [[config.routes.volunteers, 'Manage Volunteers', Users]];
+
 const roleRank = { Viewer: 0, Teacher: 1, Admin: 2 };
 
 function canSee(role, minimumRole) {
@@ -38,15 +39,36 @@ function canSee(role, minimumRole) {
 }
 
 export function Layout({ activeUser, onSignOut }) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const role = activeUser?.role || 'Viewer';
   const isSignedIn = Boolean(activeUser);
-  const showOperations = canSee(role, 'Teacher');
   const showSystem = canSee(role, 'Admin');
 
   const visiblePublicNavItems = publicNavItems;
-  const visibleOperationsNavItems = operationsNavItems; // always visible; auth check happens at route level
+  const visibleOperationsNavItems = showSystem ? [...operationsNavItems, ...adminOperationsNavItems] : operationsNavItems;
+
+  useEffect(() => {
+    if (!profileOpen) return undefined;
+
+    const closeProfileMenu = (event) => {
+      if (!event.target.closest('.user-profile-group')) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('click', closeProfileMenu);
+    return () => document.removeEventListener('click', closeProfileMenu);
+  }, [profileOpen]);
+
+  const handleSignOut = () => {
+    setProfileOpen(false);
+    setMenuOpen(false);
+    onSignOut();
+    navigate(config.routes.home, { replace: true });
+  };
 
   return (
     <>
@@ -62,22 +84,33 @@ export function Layout({ activeUser, onSignOut }) {
         </NavLink>
         <div className="header-status" aria-label="Current account status">
           {isSignedIn ? (
-            <div className="nav-group user-profile-group">
+            <div className="nav-group user-profile-group" data-open={profileOpen}>
               <button
                 type="button"
                 className="nav-group-trigger user-profile-trigger"
                 aria-haspopup="true"
+                aria-expanded={profileOpen}
+                aria-controls="user-profile-menu"
+                onClick={() => setProfileOpen((open) => !open)}
               >
                 <span>{activeUser.name}</span>
               </button>
-              <div className="nav-group-menu compact user-profile-menu">
+              <div id="user-profile-menu" className="nav-group-menu compact user-profile-menu">
                 {showSystem && (
-                  <NavLink to={config.routes.admin} className="profile-menu-item" onClick={() => setMenuOpen(false)}>
+                  <NavLink
+                    to={config.routes.admin}
+                    className="profile-menu-item"
+                    onClick={() => {
+                      setProfileOpen(false);
+                      setMenuOpen(false);
+                    }}
+                  >
                     <Settings size={14} />
-                    Admin Settings
+                    Admin Panel
                   </NavLink>
                 )}
-                <button className="secondary-button header-signout" type="button" onClick={onSignOut}>
+                <button className="profile-menu-item profile-signout" type="button" onClick={handleSignOut}>
+                  <LogOut size={14} />
                   Sign out
                 </button>
               </div>

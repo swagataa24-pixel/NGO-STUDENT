@@ -97,7 +97,7 @@ export function AdminPage({ students, photos, activeUser }) {
   return (
     <section className="section">
       <div className="container page-hero with-action">
-        <span className="eyebrow">Console</span>
+        <span className="eyebrow">Admin Panel</span>
         <div>
           <h2>System infrastructure, integration status, and user management.</h2>
           <p>Manage users, audit environment status, and view database health.</p>

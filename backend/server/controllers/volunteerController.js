@@ -27,3 +27,13 @@ export async function update(req, res, next) {
     next(error);
   }
 }
+
+export async function remove(req, res, next) {
+  try {
+    const volunteer = await Volunteer.findByIdAndDelete(req.params.id);
+    if (!volunteer) throw httpError(404, 'Volunteer not found.');
+    res.json({ message: 'Volunteer deleted.', id: req.params.id });
+  } catch (error) {
+    next(error);
+  }
+}
