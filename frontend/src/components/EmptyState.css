@@ -1,0 +1,32 @@
+.empty-state {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.empty-state svg {
+  color: var(--text-muted);
+  width: 40px;
+  height: 40px;
+  margin-bottom: 1rem;
+  stroke-width: 1.2;
+}
+
+.empty-state h3 {
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  max-width: 320px;
+  margin: 0;
+  font-size: 0.9rem;
+}

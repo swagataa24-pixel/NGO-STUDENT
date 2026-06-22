@@ -1,3 +1,5 @@
+import './AboutPage.css';
+
 export function AboutPage() {
   return (
     <section className="section about-section">
@@ -8,9 +10,9 @@ export function AboutPage() {
       </div>
       <div className="container about-hero">
         <div>
-          <span className="eyebrow">About UPAY</span>
-          <h2>A promise that kept moving.</h2>
-          <p>From Kumbhari near Nagpur to a volunteer-led education movement, UPAY exists to make learning feel reachable, dignified, and alive.</p>
+          <span className="eyebrow">Our Narrative</span>
+          <h2>A conviction that moved communities.</h2>
+          <p>What began as a localized effort in Kumbhari has evolved into a volunteer-driven national movement. UPAY is dedicated to delivering dignified, accessible, and life-changing education to underprivileged children.</p>
         </div>
         <div className="about-orb" aria-hidden="true">
           <span />
@@ -20,21 +22,21 @@ export function AboutPage() {
       <div className="container about-story-grid">
         <div className="about-timeline-card">
           <span>12 May 2010</span>
-          <h3>First learning center</h3>
-          <p>Community resistance turned into support, and a small center became the start of something much larger.</p>
+          <h3>Inception</h3>
+          <p>Overcoming structural challenges, our first center was established, laying the foundation for a sustainable grassroots movement.</p>
         </div>
         <div className="about-timeline-card accent">
           <span>19 September 2011</span>
-          <h3>Registered NGO</h3>
-          <p>The work grew into a formal volunteer network reaching children through education and care.</p>
+          <h3>NGO Integration</h3>
+          <p>Expanding volunteer participation enabled formal NGO registration, scaling our reach to support children through structural care.</p>
         </div>
         <div className="about-vision-card">
-          <h3>Vision</h3>
-          <p>Every child deserves dignity, childhood, and a fair chance to grow.</p>
+          <h3>Our Vision</h3>
+          <p>Every child deserves an environment of dignity, an uninterrupted childhood, and an equal opportunity to thrive.</p>
         </div>
         <div className="about-vision-card dark">
-          <h3>Mission</h3>
-          <p>Enable, educate, and empower children through a sustainable support ecosystem.</p>
+          <h3>Our Mission</h3>
+          <p>To educate and empower children in vulnerable regions by establishing resilient, community-led support ecosystems.</p>
         </div>
       </div>
     </section>

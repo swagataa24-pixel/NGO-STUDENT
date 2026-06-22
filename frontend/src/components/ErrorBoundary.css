@@ -1,0 +1,34 @@
+.fatal-shell {
+  align-items: center;
+  background-color: var(--bg-primary);
+  display: flex;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.fatal-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  max-width: 580px;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.fatal-card h1 {
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+  margin-bottom: 0.8rem;
+}
+
+.fatal-card p {
+  font-size: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+.fatal-card .primary-button {
+  display: inline-flex;
+}

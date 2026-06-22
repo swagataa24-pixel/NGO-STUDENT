@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, BookOpen, CalendarCheck, Camera, GraduationCap, Sparkles, Users } from 'lucide-react';
 import { config } from '../config.js';
+import './HomePage.css';
 
 const marqueeWords = ['Education', 'Dignity', 'Care', 'Access', 'Mentorship', 'Trust'];
 
 export function HomePage() {
   const workflows = [
-    [CalendarCheck, 'Daily attendance', 'Move through each class quickly and save present or absent marks with one clear action.', config.routes.attendance],
-    [GraduationCap, 'Student records', 'Keep learner profiles, guardian details, notes, and attendance patterns in one place.', config.routes.students],
-    [Camera, 'Photo proof', 'Attach activity evidence with center, date, and report context for future review.', config.routes.gallery],
-    [BarChart3, 'Monthly reports', 'Generate clean PDF summaries for classes, volunteers, photos, and intervention alerts.', config.routes.reports]
+    [CalendarCheck, 'Daily Attendance', 'Swiftly capture daily attendance and manage classroom sessions with one unified action.', config.routes.attendance],
+    [GraduationCap, 'Student Directory', 'Maintain comprehensive student profiles, parent details, academic notes, and enrollment logs.', config.routes.students],
+    [Camera, 'Photo Verification', 'Document center activities with secure image uploads to verify daily session compliance.', config.routes.gallery],
+    [BarChart3, 'Audited Reports', 'Compile detailed monthly reports on classroom progress, volunteer hours, and support alerts.', config.routes.reports]
   ];
 
   return (
@@ -24,9 +25,9 @@ export function HomePage() {
         </div>
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">Reach and Teach since 2010</span>
-            <h1>Childhood should feel possible.</h1>
-            <p>UPAY brings learning, care, and opportunity closer to children who deserve a fair start.</p>
+            <span className="eyebrow">Reach and Teach · Est. 2010</span>
+            <h1>Restoring the promise of childhood.</h1>
+            <p>UPAY brings structured learning, equal opportunity, and compassionate care to children in underserved communities, fostering a path toward dignity and success.</p>
             <div className="button-row">
               <Link className="primary-button" to={config.routes.attendance}>
                 <CalendarCheck size={18} /> Start attendance
@@ -58,8 +59,8 @@ export function HomePage() {
 
       <section className="section compact-section">
         <div className="container section-heading">
-          <span className="eyebrow">Operational flow</span>
-          <h2>A calmer daily workspace for teachers, volunteers, and admins.</h2>
+          <span className="eyebrow">Operational Excellence</span>
+          <h2>A unified workspace designed to empower educators, volunteers, and leaders.</h2>
         </div>
         <div className="container workflow-grid">
           {workflows.map(([Icon, title, text, to]) => (
@@ -75,8 +76,8 @@ export function HomePage() {
       <section className="section tinted compact-section">
         <div className="container mission-band">
           <div>
-            <span className="eyebrow">Why this matters</span>
-            <h2>Every note, attendance mark, photo, and report connects back to a child’s learning journey.</h2>
+            <span className="eyebrow">Our Collective Purpose</span>
+            <h2>Every lesson taught, attendance recorded, and progress evaluated is a direct investment in a child’s future.</h2>
           </div>
           <Link className="secondary-button" to={config.routes.volunteers}>
             <Users size={18} /> View volunteers

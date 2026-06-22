@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { config } from '../config.js';
+import './Layout.css';
 
 const publicNavItems = [
   [config.routes.home, 'Home', Home],
@@ -67,11 +68,25 @@ export function Layout({ activeUser, onSignOut }) {
           </span>
         </NavLink>
         <div className="header-status" aria-label="Current account status">
-          <span className="eyebrow">{isSignedIn ? role : 'Public visitor'}</span>
-          {isSignedIn && (
-            <button className="secondary-button header-signout" type="button" onClick={onSignOut}>
-              Sign out
-            </button>
+          {isSignedIn ? (
+            <div className="nav-group user-profile-group">
+              <button
+                type="button"
+                className="nav-group-trigger user-profile-trigger"
+                aria-haspopup="true"
+              >
+                <span>{activeUser.name}</span>
+              </button>
+              <div className="nav-group-menu compact user-profile-menu">
+                <button className="secondary-button header-signout" type="button" onClick={onSignOut}>
+                  Sign out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <NavLink className="secondary-button login-nav-button" to={config.routes.login}>
+              Sign in
+            </NavLink>
           )}
         </div>
         <button
@@ -138,6 +153,17 @@ export function Layout({ activeUser, onSignOut }) {
       <main className="page-shell" id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
+      <footer className="app-footer">
+        <div className="container footer-content">
+          <div className="footer-brand">
+            <strong>UPAY</strong>
+            <p>Education with dignity for every child.</p>
+          </div>
+          <div className="footer-meta">
+            <span>© {new Date().getFullYear()} UPAY NGO. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

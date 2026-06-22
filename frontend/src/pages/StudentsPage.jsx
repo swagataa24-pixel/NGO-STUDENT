@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { BookOpen, Eye, Pencil, Plus, Save, Search, Trash2, Users, X } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { StatusBadge } from '../components/StatusBadge.jsx';
+import './StudentsPage.css';
 import { config } from '../config.js';
 import { percent } from '../utils/attendance.js';
 import { apiRequest, mongoId } from '../utils/api.js';
@@ -198,9 +199,9 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
     <section className="section">
       <div className="container page-hero with-action">
         <div>
-          <span className="eyebrow">Students</span>
-          <h2>Class registry, detailed student records, and class-wise rosters.</h2>
-          <p>Create classes first, then add students directly into the selected class with guardian and learning details.</p>
+          <span className="eyebrow">Registry</span>
+          <h2>Student directory, classroom rosters, and development logs.</h2>
+          <p>Register classrooms, assign centers, and document student enrollment profiles to monitor longitudinal educational progress.</p>
         </div>
         <label className="search-box">
           <Search size={18} />

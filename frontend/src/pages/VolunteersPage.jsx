@@ -1,12 +1,13 @@
 import { Users } from 'lucide-react';
+import './VolunteersPage.css';
 import { EmptyState } from '../components/EmptyState.jsx';
 
 export function VolunteersPage({ volunteers = [] }) {
   return (
     <section className="section">
       <div className="container page-hero">
-        <span className="eyebrow">Volunteers</span>
-        <h2>Profiles, assigned centers, availability, and monthly contribution.</h2>
+        <span className="eyebrow">Collaborators</span>
+        <h2>Volunteer profiles, assigned centers, and operational contributions.</h2>
       </div>
       <div className="container card-grid three">
         {volunteers.map((volunteer) => (

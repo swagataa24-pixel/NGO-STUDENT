@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Chrome, Gauge, LockKeyhole, Mail, ShieldCheck, UserPlus } from 'lucide-react';
 import { config } from '../config.js';
+import './LoginPage.css';
 
 export function LoginPage({ activeUser, setActiveUser }) {
   const [mode, setMode] = useState('signin');
@@ -46,8 +47,8 @@ export function LoginPage({ activeUser, setActiveUser }) {
             <span />
           </div>
           <div className="auth-visual-content">
-            <span className="eyebrow">UPAY secure access</span>
-            <h2>{isSignup ? 'Step into the workspace.' : 'Welcome back.'}</h2>
+            <span className="eyebrow">Identity Gateway</span>
+            <h2>{isSignup ? 'Establish workspace credentials.' : 'Access administrative gateway.'}</h2>
           </div>
         </div>
 

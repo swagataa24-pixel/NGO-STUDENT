@@ -1,4 +1,5 @@
 import { AlertCircle, Check } from 'lucide-react';
+import './AdminPage.css';
 import {
   Area,
   AreaChart,
@@ -21,10 +22,10 @@ export function AdminPage({ students, photos, activeUser }) {
   return (
     <section className="section">
       <div className="container page-hero with-action">
-        <span className="eyebrow">Admin</span>
+        <span className="eyebrow">Console</span>
         <div>
-          <h2>System readiness, counts, warnings, and role-aware controls.</h2>
-          <p>Monitor the app’s operational health, then move into users, reports, and content management.</p>
+          <h2>System infrastructure, integration status, and administrative logs.</h2>
+          <p>Audit application status, environmental variables, database health, and role permissions.</p>
         </div>
       </div>
       <div className="container admin-grid">

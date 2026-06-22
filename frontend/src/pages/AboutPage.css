@@ -1,0 +1,208 @@
+/* AboutPage Styles */
+
+.about-section {
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(4rem, 10vw, 7rem);
+}
+
+.about-marquee {
+  color: rgba(18, 60, 52, 0.03);
+  font-family: var(--font-serif), serif;
+  font-size: clamp(5rem, 14vw, 11rem);
+  font-weight: 300;
+  left: 0;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 1rem;
+  white-space: nowrap;
+  user-select: none;
+  animation: about-marquee-scroll 30s linear infinite;
+  display: flex;
+  gap: 4rem;
+}
+
+.about-hero {
+  align-items: center;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: 1fr 300px;
+  min-height: 320px;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 3rem;
+  margin-bottom: 3rem;
+}
+
+.about-hero h2 {
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2.8rem, 6.5vw, 4.6rem);
+  line-height: 1.05;
+  font-weight: 400;
+  margin-bottom: 1.2rem;
+  animation: hero-fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.about-hero p {
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.6;
+  max-width: 680px;
+  margin: 0;
+  font-weight: 300;
+  animation: hero-fade-in-up 0.8s 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.about-orb {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.about-orb::before {
+  content: "";
+  inset: 0;
+  position: absolute;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(166, 141, 113, 0.12) 0%, transparent 70%);
+  animation: about-orb-pulse 6s ease-in-out infinite;
+}
+
+.about-orb span {
+  animation: about-orb-spin 25s linear infinite;
+  border: 1px solid rgba(18, 60, 52, 0.08);
+  border-radius: inherit;
+  inset: 10%;
+  position: absolute;
+}
+
+.about-orb span:nth-child(2) {
+  animation-direction: reverse;
+  animation-duration: 35s;
+  border-style: dashed;
+  inset: 22%;
+}
+
+.about-story-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  position: relative;
+  z-index: 1;
+}
+
+.about-timeline-card,
+.about-vision-card {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2.2rem 1.8rem;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.about-timeline-card:hover,
+.about-vision-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.about-timeline-card span {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.8rem;
+}
+
+.about-timeline-card h3,
+.about-vision-card h3 {
+  font-family: var(--font-serif), serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-bottom: 0.6rem;
+}
+
+.about-timeline-card p,
+.about-vision-card p {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.about-timeline-card.accent {
+  background: var(--color-gold-light);
+  border-color: rgba(166, 141, 113, 0.15);
+}
+
+.about-vision-card {
+  background: var(--bg-tint);
+}
+
+.about-vision-card.dark {
+  background: var(--color-primary);
+  border-color: transparent;
+  color: var(--bg-primary);
+}
+
+.about-vision-card.dark h3,
+.about-vision-card.dark p {
+  color: inherit;
+}
+
+/* Animations */
+@keyframes about-marquee-scroll {
+  to {
+    transform: translateX(-33.33%);
+  }
+}
+
+@keyframes about-orb-pulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes about-orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1040px) {
+  .about-hero {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .about-orb {
+    max-width: 200px;
+  }
+
+  .about-story-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .about-story-grid {
+    grid-template-columns: 1fr;
+  }
+}

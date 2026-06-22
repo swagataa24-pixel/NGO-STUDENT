@@ -1,0 +1,24 @@
+.status-badge {
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+}
+
+.status-badge.good {
+  background: var(--success-bg);
+  color: var(--success-fg);
+}
+
+.status-badge.watch {
+  background: var(--watch-bg);
+  color: var(--watch-fg);
+}
+
+.status-badge.risk {
+  background: var(--risk-bg);
+  color: var(--risk-fg);
+}

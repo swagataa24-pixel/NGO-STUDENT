@@ -1,3 +1,5 @@
+import './ResponsiveTable.css';
+
 export function ResponsiveTable({ headers, rows, ariaLabel = 'Responsive data table' }) {
   return (
     <div className="responsive-table" role="region" aria-label={ariaLabel} tabIndex={0}>

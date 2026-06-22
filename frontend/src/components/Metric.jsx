@@ -1,3 +1,5 @@
+import './Metric.css';
+
 export function Metric({ value, label }) {
   return (
     <article className="metric-card">

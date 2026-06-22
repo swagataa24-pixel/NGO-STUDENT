@@ -1,0 +1,61 @@
+/* ProgramsPage Styles */
+
+.card-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card-grid.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.soft-card {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2.2rem 1.8rem;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.soft-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  color: var(--color-primary);
+  height: 28px;
+  width: 28px;
+  margin-bottom: 1.5rem;
+  stroke-width: 1.5;
+}
+
+.soft-card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
+}
+
+.soft-card p {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1040px) {
+  .card-grid.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .card-grid.four {
+    grid-template-columns: 1fr;
+  }
+}

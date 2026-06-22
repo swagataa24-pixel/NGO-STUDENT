@@ -12,6 +12,7 @@ import {
 import { Metric } from '../components/Metric.jsx';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { ResponsiveTable } from '../components/ResponsiveTable.jsx';
+import './ReportsPage.css';
 import { percent } from '../utils/attendance.js';
 import { buildReportSummary, downloadMonthlyReportPdf, formatMonth } from '../utils/reportPdf.js';
 
@@ -60,9 +61,9 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
     <section className="section tinted">
       <div className="container page-hero with-action">
         <div>
-          <span className="eyebrow">Reports</span>
-          <h2>Formal monthly center review with attendance, classes, volunteers, and proof.</h2>
-          <p>Refine the month, center, class, and teacher before downloading a PDF or reviewing the data tables below.</p>
+          <span className="eyebrow">Analytics</span>
+          <h2>Consolidated operational reviews, attendance metrics, and compliance audits.</h2>
+          <p>Specify month, center, and class scope to export audited PDF reports and view administrative data tables.</p>
         </div>
         <div className="filter-bar">
           <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />

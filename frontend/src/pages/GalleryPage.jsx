@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Upload } from 'lucide-react';
+import './GalleryPage.css';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { config } from '../config.js';
 
@@ -61,8 +62,8 @@ export function GalleryPage({ photos, setPhotos }) {
   return (
     <section className="section">
       <div className="container page-hero">
-        <span className="eyebrow">Gallery</span>
-        <h2>Activity photos as proof, ready for reports.</h2>
+        <span className="eyebrow">Media Files</span>
+        <h2>Visual verification logs and on-site session documentation.</h2>
       </div>
       <div className="container gallery-layout">
         <form className="soft-card form-card" onSubmit={addPhoto}>

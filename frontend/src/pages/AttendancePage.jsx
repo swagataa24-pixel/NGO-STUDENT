@@ -4,6 +4,7 @@ import { EmptyState } from '../components/EmptyState.jsx';
 import { Metric } from '../components/Metric.jsx';
 import { ResponsiveTable } from '../components/ResponsiveTable.jsx';
 import { StatusBadge } from '../components/StatusBadge.jsx';
+import './AttendancePage.css';
 import { config } from '../config.js';
 import { apiRequest } from '../utils/api.js';
 import { percent } from '../utils/attendance.js';
@@ -199,9 +200,9 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
     <section className="section tinted">
       <div className="container page-hero with-action">
         <div>
-          <span className="eyebrow">Attendance</span>
-          <h2>Pick a date and class, swipe attendance, review, add proof, then submit.</h2>
-          <p>Nothing is stored until every student is marked and one class photo proof is attached.</p>
+          <span className="eyebrow">Operational Logs</span>
+          <h2>Capture classroom sessions, record student presence, and upload proofs.</h2>
+          <p>Attendance records are finalized and saved once all students are registered and classroom photo proof is attached.</p>
         </div>
         <div className="attendance-start-controls">
           <label className="class-picker">
