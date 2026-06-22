@@ -205,7 +205,7 @@ function App() {
               path={config.routes.attendance.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
-                  <AttendancePage students={students} setStudents={setStudents} classes={classes} />
+                  <AttendancePage students={students} setStudents={setStudents} classes={classes} setPhotos={setPhotos} />
                 </AccessRoute>
               }
             />
@@ -221,7 +221,7 @@ function App() {
               path={config.routes.reports.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
-                  <ReportsPage students={students} photos={photos} volunteers={volunteers} />
+                  <ReportsPage students={students} photos={photos} volunteers={volunteers} classes={classes} />
                 </AccessRoute>
               }
             />
