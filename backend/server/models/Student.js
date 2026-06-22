@@ -26,7 +26,6 @@ const studentSchema = new mongoose.Schema(
     classId:         String,
     guardianName:    String,                              // encrypted
     guardianContact: String,                              // encrypted
-    enrollmentDate:  Date,
     attendanceStats: {
       attended:  { type: Number, default: 0 },
       conducted: { type: Number, default: 0 }

@@ -217,6 +217,22 @@ function App() {
               }
             />
             <Route
+              path={`${config.routes.students.replace(/^\//, '')}/:classId`}
+              element={
+                <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
+                  <StudentsPage
+                    students={students}
+                    setStudents={setStudents}
+                    classes={classes}
+                    setClasses={setClasses}
+                    volunteers={volunteers}
+                    dataStatus={dataStatus}
+                    refreshData={refreshData}
+                  />
+                </AccessRoute>
+              }
+            />
+            <Route
               path={config.routes.attendance.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>

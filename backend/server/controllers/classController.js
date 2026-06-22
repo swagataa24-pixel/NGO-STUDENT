@@ -12,7 +12,6 @@ export async function index(req, res, next) {
 export async function create(req, res, next) {
   try {
     if (!req.body.name) throw httpError(400, 'Class name is required.');
-    if (!req.body.center) throw httpError(400, 'Center is required.');
     res.status(201).json(await classService.createClass(req.body));
   } catch (error) {
     next(error);

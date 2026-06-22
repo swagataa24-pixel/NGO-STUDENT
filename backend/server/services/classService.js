@@ -4,7 +4,7 @@ export async function listClasses(filters = {}) {
   const query = {};
   if (filters.centerId) query.centerId = filters.centerId;
   if (filters.activeOnly === 'true') query.activeStatus = true;
-  return ClassGroup.find(query).sort({ name: 1, center: 1 });
+  return ClassGroup.find(query).sort({ name: 1 });
 }
 
 export async function createClass(payload) {

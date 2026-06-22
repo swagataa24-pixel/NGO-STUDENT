@@ -1,4 +1,17 @@
 import { Student } from '../models/Student.js';
+import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
+
+async function processPhotoUrl(photoUrl) {
+  if (photoUrl && photoUrl.startsWith('data:') && isCloudinaryConfigured()) {
+    try {
+      const result = await uploadToCloudinary(photoUrl);
+      return result.url;
+    } catch (err) {
+      console.error('Cloudinary upload failed for student photo, falling back:', err.message);
+    }
+  }
+  return photoUrl;
+}
 
 export async function listStudents(filters = {}) {
   const query = {};
@@ -8,6 +21,9 @@ export async function listStudents(filters = {}) {
 }
 
 export async function createStudent(payload) {
+  if (payload.photoUrl) {
+    payload.photoUrl = await processPhotoUrl(payload.photoUrl);
+  }
   return Student.create(payload);
 }
 
@@ -16,6 +32,9 @@ export async function getStudent(id) {
 }
 
 export async function updateStudent(id, payload) {
+  if (payload.photoUrl) {
+    payload.photoUrl = await processPhotoUrl(payload.photoUrl);
+  }
   return Student.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
 }
 

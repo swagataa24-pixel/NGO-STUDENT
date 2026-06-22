@@ -205,16 +205,20 @@ export function buildReportSummary(students, photos, volunteers = []) {
   };
 }
 
-export function downloadMonthlyReportPdf({ students, photos, volunteers = [], month, center, className, teacher }) {
+export function downloadMonthlyReportPdf({ students, photos, volunteers = [], month, center, className }) {
   const report = buildReportSummary(students, photos, volunteers);
-  const titleMonth = formatMonth(month);
+  let titleMonth;
+  if (month && month.length === 4) {
+    titleMonth = month; // It's a year
+  } else {
+    titleMonth = formatMonth(month);
+  }
   const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 42;
   const filtersText = [
-    `Class: ${className === 'all' ? 'All Classes' : className}`,
-    `Teacher: ${teacher || 'All Teachers'}`
+    `Class: ${className === 'all' ? 'All Classes' : className}`
   ].join('\n');
 
   // Format attendance data with colored status cells
@@ -299,15 +303,16 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
         ]
       ];
 
+  const isYearly = month && month.length === 4;
   doc.setProperties({
-    title: `UPAY Monthly Report - ${titleMonth}`,
+    title: `UPAY ${isYearly ? 'Yearly' : 'Monthly'} Report - ${titleMonth}`,
     subject: 'Attendance, student progress, volunteer contribution, and activity proof',
     author: 'UPAY NGO'
   });
 
   addHeader(
     doc,
-    'UPAY NGO Monthly Education Report',
+    `UPAY NGO ${isYearly ? 'Yearly' : 'Monthly'} Education Report`,
     'Attendance, student progress, volunteer contribution, and activity proof are summarized in one operational view.',
     titleMonth,
     filtersText
