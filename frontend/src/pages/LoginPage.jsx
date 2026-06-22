@@ -61,19 +61,20 @@ export function LoginPage({ activeUser, setActiveUser }) {
             </button>
           </div>
 
-          {activeUser ? (
-            <div className="signed-in-card">
-              <ShieldCheck size={42} />
-              <h3>{activeUser.name}</h3>
-              <p>{activeUser.role} access is active for this session.</p>
-              <button className="secondary-button" onClick={() => setActiveUser(null)} type="button">
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <form className="auth-form" onSubmit={localAuth}>
-              <span className="eyebrow">{isSignup ? 'New access' : 'Google OAuth'}</span>
-              <h1>{isSignup ? 'Create access' : 'Sign in'}</h1>
+          <div className="auth-card">
+            {activeUser ? (
+              <div className="signed-in-card">
+                <ShieldCheck size={42} />
+                <h3>{activeUser.name}</h3>
+                <p>{activeUser.role} access is active.</p>
+                <button className="secondary-button" onClick={() => setActiveUser(null)} type="button">
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <form className="auth-form" onSubmit={localAuth}>
+                <span className="eyebrow">{isSignup ? 'New access' : 'Google OAuth'}</span>
+                <h1>{isSignup ? 'Create access' : 'Sign in'}</h1>
 
               {isSignup && (
                 <label>
@@ -127,9 +128,10 @@ export function LoginPage({ activeUser, setActiveUser }) {
                 {isSignup ? 'Sign up with Google' : 'Continue with Google'}
               </button>
 
-              <small>Secure login through UPAY Google workspace.</small>
-            </form>
-          )}
+                <small>Secure login through UPAY Google workspace.</small>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </section>

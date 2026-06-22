@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
@@ -6,7 +6,6 @@ import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 import { Layout } from './components/Layout.jsx';
 import { config } from './config.js';
 import { apiRequest } from './utils/api.js';
-import { percent } from './utils/attendance.js';
 import './styles.css';
 
 const CHUNK_RELOAD_KEY = 'upay.chunkReloaded';
@@ -41,7 +40,6 @@ const AttendancePage = lazyRoute(() => import('./pages/AttendancePage.jsx'), 'At
 const VolunteersPage = lazyRoute(() => import('./pages/VolunteersPage.jsx'), 'VolunteersPage');
 const ReportsPage = lazyRoute(() => import('./pages/ReportsPage.jsx'), 'ReportsPage');
 const GalleryPage = lazyRoute(() => import('./pages/GalleryPage.jsx'), 'GalleryPage');
-const ContactPage = lazyRoute(() => import('./pages/ContactPage.jsx'), 'ContactPage');
 const AdminPage = lazyRoute(() => import('./pages/AdminPage.jsx'), 'AdminPage');
 const LoginPage = lazyRoute(() => import('./pages/LoginPage.jsx'), 'LoginPage');
 
@@ -180,26 +178,12 @@ function App() {
     refreshData();
   }, []);
 
-  const stats = useMemo(() => {
-    const activeStudents = students.filter((student) => student.activeStatus !== false && student.active !== false);
-    const average =
-      activeStudents.reduce((sum, student) => sum + percent(student), 0) / Math.max(activeStudents.length, 1);
-
-    return {
-      students: activeStudents.length,
-      centers: new Set(activeStudents.map((student) => student.centerId)).size,
-      volunteers: volunteers.length,
-      reports: 12,
-      average: Math.round(average)
-    };
-  }, [students]);
-
   return (
     <BrowserRouter>
       <Suspense fallback={<RouteLoader />}>
         <Routes>
           <Route element={<Layout activeUser={activeUser} onSignOut={() => setActiveUser(null)} />}>
-            <Route index element={<HomePage stats={stats} />} />
+            <Route index element={<HomePage />} />
             <Route path={config.routes.about.replace(/^\//, '')} element={<AboutPage />} />
             <Route path={config.routes.programs.replace(/^\//, '')} element={<ProgramsPage />} />
             <Route
@@ -242,7 +226,6 @@ function App() {
               }
             />
             <Route path={config.routes.gallery.replace(/^\//, '')} element={<GalleryPage photos={photos} setPhotos={setPhotos} />} />
-            <Route path={config.routes.contact.replace(/^\//, '')} element={<ContactPage />} />
             <Route
               path={config.routes.admin.replace(/^\//, '')}
               element={

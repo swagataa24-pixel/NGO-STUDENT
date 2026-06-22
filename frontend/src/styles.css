@@ -1816,6 +1816,17 @@ figcaption span {
   padding: clamp(1.1rem, 4vw, 2.4rem);
 }
 
+.auth-card {
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(36, 49, 47, 0.14);
+  margin: auto;
+  max-width: 460px;
+  padding: clamp(1.1rem, 3vw, 1.7rem);
+  width: 100%;
+}
+
 .auth-tabs {
   background: rgba(255, 255, 255, 0.56);
   border-radius: 999px;
@@ -1848,15 +1859,15 @@ figcaption span {
 .auth-form {
   animation: auth-form-in 460ms ease both;
   display: grid;
-  gap: 0.72rem;
-  margin: 2rem auto 0;
-  max-width: 500px;
+  gap: 0.62rem;
+  margin: 1.55rem auto 0;
+  max-width: 420px;
   width: 100%;
 }
 
 .auth-form h1 {
-  font-size: clamp(2.6rem, 6vw, 4.8rem);
-  line-height: 0.96;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1;
   margin-bottom: 0;
 }
 
@@ -1872,7 +1883,7 @@ figcaption span {
 
 .auth-form label > span {
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -1886,6 +1897,12 @@ figcaption span {
   gap: 0.6rem;
   padding: 0 0.75rem;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.auth-input input,
+.auth-two-col input,
+.auth-two-col select {
+  min-height: 42px;
 }
 
 .auth-input:focus-within {
@@ -1928,7 +1945,7 @@ figcaption span {
   font-weight: 900;
   gap: 0.55rem;
   justify-content: center;
-  min-height: 50px;
+  min-height: 46px;
   padding: 0.78rem 1rem;
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
@@ -1947,6 +1964,131 @@ figcaption span {
   max-width: 460px;
   place-items: center;
   text-align: center;
+}
+
+.about-section {
+  background:
+    radial-gradient(circle at 14% 8%, rgba(68, 111, 101, 0.2), transparent 30%),
+    radial-gradient(circle at 84% 70%, rgba(224, 194, 116, 0.2), transparent 32%);
+  overflow: hidden;
+  position: relative;
+}
+
+.about-marquee {
+  animation: about-marquee 24s linear infinite;
+  color: rgba(36, 60, 54, 0.07);
+  display: flex;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4rem, 11vw, 9rem);
+  font-weight: 900;
+  gap: 4rem;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 1rem;
+  white-space: nowrap;
+}
+
+.about-hero {
+  align-items: center;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 360px;
+  position: relative;
+  z-index: 1;
+}
+
+.about-hero h2 {
+  animation: hero-copy-in 720ms cubic-bezier(0.2, 0.86, 0.2, 1) both;
+  font-size: clamp(3.2rem, 8vw, 7rem);
+  line-height: 0.88;
+  max-width: 860px;
+}
+
+.about-hero p {
+  animation: hero-copy-in 720ms 120ms cubic-bezier(0.2, 0.86, 0.2, 1) both;
+  font-size: clamp(1.05rem, 2vw, 1.36rem);
+  max-width: 720px;
+}
+
+.about-orb {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  position: relative;
+}
+
+.about-orb::before {
+  animation: about-orb-pulse 5s ease-in-out infinite;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(118, 166, 153, 0.36) 46%, transparent 70%);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.about-orb span {
+  animation: auth-spin 18s linear infinite;
+  border: 1px solid rgba(36, 60, 54, 0.18);
+  border-radius: inherit;
+  inset: 12%;
+  position: absolute;
+}
+
+.about-orb span:nth-child(2) {
+  animation-direction: reverse;
+  border-style: dashed;
+  inset: 26%;
+}
+
+.about-story-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  position: relative;
+  z-index: 1;
+}
+
+.about-timeline-card,
+.about-vision-card {
+  animation: auth-form-in 540ms ease both;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
+  box-shadow: 0 24px 70px rgba(36, 49, 47, 0.12);
+  min-height: 260px;
+  padding: 1.4rem;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.about-timeline-card:hover,
+.about-vision-card:hover {
+  box-shadow: 0 30px 80px rgba(36, 49, 47, 0.18);
+  transform: translateY(-4px);
+}
+
+.about-timeline-card span {
+  color: #5f8b80;
+  font-weight: 900;
+}
+
+.about-timeline-card.accent {
+  background: rgba(239, 225, 185, 0.76);
+}
+
+.about-vision-card {
+  background: rgba(230, 241, 237, 0.76);
+}
+
+.about-vision-card.dark {
+  background: #203832;
+  color: white;
+}
+
+.about-vision-card.dark h3,
+.about-vision-card.dark p {
+  color: white;
 }
 
 .signed-in-card svg {
@@ -2079,6 +2221,24 @@ figcaption span {
   }
 }
 
+@keyframes about-marquee {
+  to {
+    transform: translateX(-33.33%);
+  }
+}
+
+@keyframes about-orb-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
 .empty-state {
   display: grid;
   min-height: 260px;
@@ -2154,6 +2314,7 @@ figcaption span {
   }
 
   .hero-grid,
+  .about-hero,
   .story-grid,
   .student-layout,
   .student-management-grid,
@@ -2181,6 +2342,7 @@ figcaption span {
   }
 
   .impact-strip,
+  .about-story-grid,
   .workflow-grid,
   .card-grid.four,
   .card-grid.three {
@@ -2237,6 +2399,7 @@ figcaption span {
 
   .nav.open,
   .impact-strip,
+  .about-story-grid,
   .workflow-grid,
   .card-grid.four,
   .card-grid.three {

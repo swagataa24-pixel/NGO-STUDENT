@@ -19,7 +19,6 @@ export const config = {
     volunteers: import.meta.env.VITE_ROUTE_VOLUNTEERS || '/volunteers',
     reports: import.meta.env.VITE_ROUTE_REPORTS || '/reports',
     gallery: import.meta.env.VITE_ROUTE_GALLERY || '/gallery',
-    contact: import.meta.env.VITE_ROUTE_CONTACT || '/contact',
     admin: import.meta.env.VITE_ROUTE_ADMIN || '/admin',
     login: import.meta.env.VITE_ROUTE_LOGIN || '/login'
   },

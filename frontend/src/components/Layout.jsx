@@ -9,7 +9,6 @@ import {
   Home,
   Image,
   LogIn,
-  Mail,
   Menu,
   Settings,
   Users,
@@ -20,8 +19,7 @@ import { config } from '../config.js';
 const publicNavItems = [
   [config.routes.home, 'Home', Home],
   [config.routes.about, 'About', BookOpen],
-  [config.routes.programs, 'Programs', HeartHandshake],
-  [config.routes.contact, 'Contact', Mail]
+  [config.routes.programs, 'Programs', HeartHandshake]
 ];
 
 const operationsNavItems = [
