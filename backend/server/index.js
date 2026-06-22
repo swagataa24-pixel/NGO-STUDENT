@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
+import { buildToken } from './services/authService.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/authRoutes.js';
 import { attendanceRouter } from './routes/attendanceRoutes.js';
@@ -107,7 +108,11 @@ app.get(
     failureRedirect: 'https://ngo-student-f.onrender.com/login'
   }),
   (req, res) => {
-    res.redirect('https://ngo-student-f.onrender.com/dashboard');
+    const frontendUrl = process.env.CLIENT_URL || 'https://ngo-student-f.onrender.com';
+    const redirectUrl = new URL('/login', frontendUrl);
+    redirectUrl.searchParams.set('token', buildToken(req.user));
+    redirectUrl.searchParams.set('user', Buffer.from(JSON.stringify(req.user)).toString('base64url'));
+    res.redirect(redirectUrl.toString());
   }
 );
 

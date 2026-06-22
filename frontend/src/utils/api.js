@@ -6,9 +6,11 @@ export async function apiRequest(path, options = {}) {
 
   let response;
   try {
+    const token = window.localStorage.getItem('upay.authToken');
     response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {})
       },
       ...options

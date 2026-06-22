@@ -101,6 +101,12 @@ function AccessRoute({ activeUser, allowedRoles, children }) {
   return children;
 }
 
+function decodeAuthUser(encodedUser) {
+  const normalized = encodedUser.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
+  return JSON.parse(window.atob(padded));
+}
+
 function App() {
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -110,6 +116,24 @@ function App() {
   const [dataStatus, setDataStatus] = useState({ loading: true, error: '' });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const encodedUser = params.get('user');
+
+    if (token && encodedUser) {
+      try {
+        const user = decodeAuthUser(encodedUser);
+        window.localStorage.setItem('upay.authToken', token);
+        window.localStorage.setItem('upay.activeUser', JSON.stringify(user));
+        setActiveUser(user);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      } catch {
+        window.localStorage.removeItem('upay.authToken');
+        window.localStorage.removeItem('upay.activeUser');
+      }
+    }
+
     const storedUser = window.localStorage.getItem('upay.activeUser');
     if (storedUser) {
       try {
@@ -125,6 +149,7 @@ function App() {
       window.localStorage.setItem('upay.activeUser', JSON.stringify(activeUser));
     } else {
       window.localStorage.removeItem('upay.activeUser');
+      window.localStorage.removeItem('upay.authToken');
     }
   }, [activeUser]);
 
