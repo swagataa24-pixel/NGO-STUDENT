@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server/index.js",
+    "build": "node -e \"console.log('No backend build step required')\"",
     "start": "node server/index.js"
   },
   "dependencies": {

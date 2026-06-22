@@ -2,16 +2,16 @@
 
 ## Deployment Model
 
-The project is deployed as two parts:
+The project is deployed as two separate apps:
 
 1. Backend API on Render or a similar Node host.
 2. Frontend static build on Vercel or a similar static host.
 
 ## Backend Deployment
 
-Use the root [render.yaml](render.yaml) file.
+Use the root `render.yaml` file, which points Render to `backend`.
 
-### Required backend env vars
+### Required Backend Env Vars
 
 - `MONGO_URI`
 - `CLIENT_URL`
@@ -25,18 +25,19 @@ Use the root [render.yaml](render.yaml) file.
 - `CLOUDINARY_API_SECRET`
 - `ADMIN_EMAILS`
 
-### Backend build/start flow
+### Backend Build/Start Flow
 
 ```bash
+cd backend
 npm install
-npm run start --workspace backend
+npm run start
 ```
 
 ## Frontend Deployment
 
-Use the root [vercel.json](vercel.json) file or set the same values in Vercel project settings.
+Use the root `vercel.json` file, which builds from `frontend`.
 
-### Required frontend env vars
+### Required Frontend Env Vars
 
 - `VITE_API_BASE_URL`
 - `VITE_APP_NAME`
@@ -46,11 +47,12 @@ Use the root [vercel.json](vercel.json) file or set the same values in Vercel pr
 - `VITE_CLOUDINARY_FOLDER`
 - `VITE_DEFAULT_CENTER_ID`
 
-### Frontend build flow
+### Frontend Build Flow
 
 ```bash
+cd frontend
 npm install
-npm run build --workspace frontend
+npm run build
 ```
 
 ## Production Notes

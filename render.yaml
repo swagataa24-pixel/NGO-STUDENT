@@ -1,4 +1,11 @@
 services:
+  - type: static
+    name: upay-ngo-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+
   - type: web
     name: upay-ngo-backend
     env: node
