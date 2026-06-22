@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Camera, Check, ChevronLeft, ChevronRight, Image, RotateCcw, Save, Upload } from 'lucide-react';
+import { Camera, Check, ChevronLeft, ChevronRight, RotateCcw, Save } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { Metric } from '../components/Metric.jsx';
 import { ResponsiveTable } from '../components/ResponsiveTable.jsx';
@@ -39,6 +39,7 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
     [classGroups, students]
   );
   const [selectedClass, setSelectedClass] = useState(classNames[0] || '');
+  const [sessionDate, setSessionDate] = useState(new Date().toISOString().slice(0, 10));
   const [index, setIndex] = useState(0);
   const [records, setRecords] = useState([]);
   const [submittedSession, setSubmittedSession] = useState(null);
@@ -46,7 +47,6 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
   const [proofFile, setProofFile] = useState(null);
   const [proofPreview, setProofPreview] = useState('');
   const [linkedPhoto, setLinkedPhoto] = useState(null);
-  const [proofState, setProofState] = useState({ status: 'idle', message: '' });
 
   useEffect(() => {
     if (!selectedClass && classNames.length) {
@@ -84,7 +84,6 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
     setProofPreview('');
     setLinkedPhoto(null);
     setSubmitState({ status: 'idle', message: '' });
-    setProofState({ status: 'idle', message: '' });
   };
 
   const mark = (status) => {
@@ -117,12 +116,16 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
       setSubmitState({ status: 'error', message: 'Please mark every student before submitting.' });
       return;
     }
+    if (!proofFile) {
+      setSubmitState({ status: 'error', message: 'Please attach one class photo proof before submitting.' });
+      return;
+    }
 
     const payload = {
       centerId: roster[0]?.centerId || config.defaultCenter,
       className: selectedClass,
       teacherId: 'demo-teacher',
-      date: new Date().toISOString(),
+      date: new Date(`${sessionDate}T12:00:00`).toISOString(),
       totalStudents: roster.length,
       presentCount: present,
       absentCount: absent,
@@ -133,29 +136,57 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
       }))
     };
 
-    setSubmitState({ status: 'saving', message: 'Saving attendance session...' });
+    setSubmitState({ status: 'saving', message: 'Saving attendance and linking photo proof...' });
 
     try {
       const session = await apiRequest(config.apiRoutes.attendanceSession, {
         method: 'POST',
         body: JSON.stringify(payload)
       });
+      const imageUrl = await readFileAsDataUrl(proofFile);
+      const photoPayload = {
+        imageUrl,
+        caption: `${selectedClass} class proof`,
+        center: roster[0]?.center || roster[0]?.centerId || config.defaultCenter,
+        centerId: session.centerId || roster[0]?.centerId || config.defaultCenter,
+        className: selectedClass,
+        activity: 'Attendance class proof',
+        activityDate: payload.date,
+        relatedSessionId: session._id || session.id,
+        uploadedBy: session.teacherId || 'teacher'
+      };
+      const response = await apiRequest(`${config.apiRoutes.photos}/upload`, {
+        method: 'POST',
+        body: JSON.stringify(photoPayload)
+      });
+      const photo = {
+        ...photoPayload,
+        ...(response.photo || {}),
+        id: response.photo?._id || response.photo?.id || crypto.randomUUID(),
+        date: sessionDate
+      };
       setSubmittedSession(session);
+      setLinkedPhoto(photo);
+      setPhotos?.((items) => [photo, ...items]);
       setStudents((items) =>
         items.map((student) => {
           const record = records.find((item) => item.studentId === mongoId(student));
           if (!record) return student;
+          const conducted = (student.attendanceStats?.conducted ?? student.conducted ?? 0) + 1;
+          const attended = (student.attendanceStats?.attended ?? student.attended ?? 0) + (record.status === 'present' ? 1 : 0);
           return {
             ...student,
+            conducted,
+            attended,
             attendanceStats: {
               ...(student.attendanceStats || {}),
-              conducted: (student.attendanceStats?.conducted ?? student.conducted ?? 0) + 1,
-              attended: (student.attendanceStats?.attended ?? student.attended ?? 0) + (record.status === 'present' ? 1 : 0)
+              conducted,
+              attended
             }
           };
         })
       );
-      setSubmitState({ status: 'success', message: 'Attendance saved successfully.' });
+      setSubmitState({ status: 'success', message: 'Attendance and photo proof saved successfully.' });
     } catch (error) {
       setSubmitState({
         status: 'error',
@@ -164,61 +195,28 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
     }
   };
 
-  const linkProofPhoto = async () => {
-    if (!submittedSession || !proofFile) {
-      setProofState({ status: 'error', message: 'Save attendance and choose a class photo first.' });
-      return;
-    }
-
-    setProofState({ status: 'saving', message: 'Linking photo proof...' });
-    try {
-      const imageUrl = await readFileAsDataUrl(proofFile);
-      const payload = {
-        imageUrl,
-        caption: `${selectedClass} class proof`,
-        center: roster[0]?.center || roster[0]?.centerId || config.defaultCenter,
-        centerId: submittedSession.centerId || roster[0]?.centerId || config.defaultCenter,
-        className: selectedClass,
-        activity: 'Attendance class proof',
-        activityDate: submittedSession.date || new Date().toISOString(),
-        relatedSessionId: submittedSession._id || submittedSession.id,
-        uploadedBy: submittedSession.teacherId || 'teacher'
-      };
-
-      const response = await apiRequest(`${config.apiRoutes.photos}/upload`, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
-      const photo = {
-        ...payload,
-        ...(response.photo || {}),
-        id: response.photo?._id || response.photo?.id || crypto.randomUUID(),
-        date: new Date(payload.activityDate).toISOString().slice(0, 10)
-      };
-      setLinkedPhoto(photo);
-      setPhotos?.((items) => [photo, ...items]);
-      setProofState({ status: 'success', message: 'Photo proof linked to this class session.' });
-    } catch (error) {
-      setProofState({ status: 'error', message: error.message });
-    }
-  };
-
   return (
     <section className="section tinted">
       <div className="container page-hero with-action">
         <div>
           <span className="eyebrow">Attendance</span>
-          <h2>Choose a class, mark each profile, review mistakes, then submit.</h2>
-          <p>Left marks absent. Right marks present. Nothing is stored until you submit the reviewed session.</p>
+          <h2>Pick a date and class, swipe attendance, review, add proof, then submit.</h2>
+          <p>Nothing is stored until every student is marked and one class photo proof is attached.</p>
         </div>
-        <label className="class-picker">
-          <span>Class</span>
-          <select value={selectedClass} onChange={(event) => resetSession(event.target.value)}>
-            {classNames.map((className) => (
-              <option value={className} key={className}>{className}</option>
-            ))}
-          </select>
-        </label>
+        <div className="attendance-start-controls">
+          <label className="class-picker">
+            <span>Date</span>
+            <input type="date" value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} disabled={Boolean(records.length)} />
+          </label>
+          <label className="class-picker">
+            <span>Class</span>
+            <select value={selectedClass} onChange={(event) => resetSession(event.target.value)} disabled={Boolean(records.length)}>
+              {classNames.map((className) => (
+                <option value={className} key={className}>{className}</option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
 
       <div className="container attendance-workspace">
@@ -256,9 +254,9 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
               <button
                 className="primary-button"
                 onClick={submitAttendance}
-                disabled={!records.length || records.length !== roster.length || submitState.status === 'saving' || Boolean(submittedSession)}
+                disabled={!records.length || records.length !== roster.length || !proofFile || submitState.status === 'saving' || Boolean(submittedSession)}
               >
-                <Save size={18} /> Submit to MongoDB
+                <Save size={18} /> Submit attendance
               </button>
             </div>
           </div>
@@ -269,6 +267,44 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
             <EmptyState title="No marks yet" text="Start with the first profile above." />
           )}
 
+          {records.length === roster.length && roster.length > 0 && (
+            <div className="inline-proof-panel">
+              <div className="review-heading">
+                <div>
+                  <span className="eyebrow">Photo proof</span>
+                  <h3>Add class image before final submit</h3>
+                </div>
+                {linkedPhoto && (
+                  <a className="secondary-button" href={linkedPhoto.imageUrl} target="_blank" rel="noreferrer">
+                    Preview linked photo
+                  </a>
+                )}
+              </div>
+              <div className="proof-upload-row">
+                <label className="click-image-card">
+                  <Camera size={22} />
+                  <strong>Click image</strong>
+                  <span>Take or choose one photo as proof that the class was held on {sessionDate}.</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    disabled={Boolean(submittedSession)}
+                    onChange={(event) => setProofFile(event.target.files?.[0] || null)}
+                  />
+                </label>
+                {proofPreview || linkedPhoto ? (
+                  <figure className="proof-preview">
+                    <img src={linkedPhoto?.imageUrl || proofPreview} alt="Class proof preview" />
+                    <figcaption>{linkedPhoto ? 'Linked photo proof' : `Selected proof for ${sessionDate}`}</figcaption>
+                  </figure>
+                ) : (
+                  <EmptyState title="No proof image selected" text="Attach one photo before final submit." />
+                )}
+              </div>
+            </div>
+          )}
+
           {submitState.message && (
             <p className={`submit-message ${submitState.status}`}>
               {submitState.status === 'success' && <Check size={18} />}
@@ -277,49 +313,6 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
           )}
         </div>
       </div>
-
-      {submittedSession && (
-        <div className="container attendance-proof-grid">
-          <div className="table-card proof-card">
-            <div className="review-heading">
-              <div>
-                <span className="eyebrow">Class proof</span>
-                <h3>Link a photo after attendance</h3>
-              </div>
-              {linkedPhoto && (
-                <a className="secondary-button" href={linkedPhoto.imageUrl} target="_blank" rel="noreferrer">
-                  <Image size={18} /> Preview linked photo
-                </a>
-              )}
-            </div>
-            <div className="proof-upload-row">
-              <label className="click-image-card">
-                <Camera size={22} />
-                <strong>Click image</strong>
-                <span>Take or choose one photo as proof that the class was held.</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(event) => setProofFile(event.target.files?.[0] || null)}
-                />
-              </label>
-              {proofPreview || linkedPhoto ? (
-                <figure className="proof-preview">
-                  <img src={linkedPhoto?.imageUrl || proofPreview} alt="Class proof preview" />
-                  <figcaption>{linkedPhoto ? 'Linked photo proof' : 'Selected photo preview'}</figcaption>
-                </figure>
-              ) : (
-                <EmptyState title="No proof image selected" text="Add one photo after taking attendance." />
-              )}
-            </div>
-            <button className="primary-button" onClick={linkProofPhoto} disabled={!proofFile || proofState.status === 'saving'}>
-              <Upload size={18} /> Link photo proof
-            </button>
-            {proofState.message && <p className={`submit-message ${proofState.status}`}>{proofState.message}</p>}
-          </div>
-        </div>
-      )}
     </section>
   );
 }

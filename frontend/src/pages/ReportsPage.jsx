@@ -137,54 +137,52 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
             <EmptyState title="No student attendance rows" text="Choose a class with marked students." />
           )}
         </div>
-        <div className="table-card">
-          <h3>Student Support Table</h3>
-          <ResponsiveTable
-            headers={['Student', 'Guardian', 'Contact', 'Latest Note']}
-            rows={
-              report.interventionStudents.length
-                ? report.interventionStudents.map((student) => [
-                    student.name,
-                    student.guardianName,
-                    student.guardianContact,
-                    student.note
-                  ])
-                : [['No students below 40% attendance', '-', '-', '-']]
-            }
-          />
-        </div>
-        <div className="table-card">
-          <h3>Volunteer Contribution Table</h3>
-          <ResponsiveTable
-            headers={['Volunteer', 'Role', 'Center', 'Availability', 'Hours']}
-            rows={volunteers.map((volunteer) => [
-              volunteer.name,
-              volunteer.role,
-              volunteer.center || volunteer.assignedCenter,
-              volunteer.availability,
-              `${volunteer.hours || volunteer.activityLogs?.reduce((sum, item) => sum + (item.hours || 0), 0) || 0}h`
-            ])}
-          />
-        </div>
-        <div className="table-card">
-          <h3>Activity Photo Proof Table</h3>
-          <ResponsiveTable
-            headers={['Date', 'Center', 'Activity', 'Caption', 'Image']}
-            rows={
-              filteredPhotos.length
-                ? filteredPhotos.map((photo) => [
-                    photoDate(photo),
-                    photoCenter(photo),
-                    photoActivity(photo),
-                    photo.caption || '-',
-                    <button className="secondary-button compact-button" onClick={() => setPreviewPhoto(photo)} type="button" key={photo.id || photo._id}>
-                      <Eye size={16} /> Preview
-                    </button>
-                  ])
-                : [['No linked photos yet', '-', '-', '-', '-']]
-            }
-          />
-        </div>
+        {report.interventionStudents.length > 0 && (
+          <div className="table-card">
+            <h3>Student Support Table</h3>
+            <ResponsiveTable
+              headers={['Student', 'Guardian', 'Contact', 'Latest Note']}
+              rows={report.interventionStudents.map((student) => [
+                student.name,
+                student.guardianName,
+                student.guardianContact,
+                student.note
+              ])}
+            />
+          </div>
+        )}
+        {volunteers.length > 0 && (
+          <div className="table-card">
+            <h3>Volunteer Contribution Table</h3>
+            <ResponsiveTable
+              headers={['Volunteer', 'Role', 'Center', 'Availability', 'Hours']}
+              rows={volunteers.map((volunteer) => [
+                volunteer.name,
+                volunteer.role,
+                volunteer.center || volunteer.assignedCenter,
+                volunteer.availability,
+                `${volunteer.hours || volunteer.activityLogs?.reduce((sum, item) => sum + (item.hours || 0), 0) || 0}h`
+              ])}
+            />
+          </div>
+        )}
+        {filteredPhotos.length > 0 && (
+          <div className="table-card">
+            <h3>Activity Photo Proof Table</h3>
+            <ResponsiveTable
+              headers={['Date', 'Center', 'Activity', 'Caption', 'Image']}
+              rows={filteredPhotos.map((photo) => [
+                photoDate(photo),
+                photoCenter(photo),
+                photoActivity(photo),
+                photo.caption || '-',
+                <button className="secondary-button compact-button" onClick={() => setPreviewPhoto(photo)} type="button" key={photo.id || photo._id}>
+                  <Eye size={16} /> Preview
+                </button>
+              ])}
+            />
+          </div>
+        )}
       </div>}
 
       {previewPhoto && (
@@ -196,7 +194,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
             <img src={previewPhoto.imageUrl} alt={previewPhoto.caption || 'Linked class proof'} />
             <div>
               <strong>{previewPhoto.caption || 'Linked class proof'}</strong>
-              <span>{photoCenter(previewPhoto)} · {photoDate(previewPhoto)}</span>
+              <span>{photoCenter(previewPhoto)} / {photoDate(previewPhoto)}</span>
             </div>
           </div>
         </div>

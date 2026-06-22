@@ -3,8 +3,20 @@ import { Upload } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { config } from '../config.js';
 
+const today = () => new Date().toISOString().slice(0, 10);
+
+function displayPhotoDate(photo) {
+  return photo.date || (photo.activityDate ? photo.activityDate.slice(0, 10) : today());
+}
+
 export function GalleryPage({ photos, setPhotos }) {
-  const [draft, setDraft] = useState({ caption: '', center: '', activity: '', file: null });
+  const [draft, setDraft] = useState({
+    caption: '',
+    center: '',
+    activity: '',
+    date: today(),
+    file: null
+  });
   const [previewUrl, setPreviewUrl] = useState('');
 
   useEffect(() => {
@@ -38,11 +50,12 @@ export function GalleryPage({ photos, setPhotos }) {
         caption: draft.caption,
         center: draft.center || 'Unassigned center',
         activity: draft.activity || 'Activity proof',
-        date: new Date().toISOString().slice(0, 10)
+        activityDate: new Date(`${draft.date}T12:00:00`).toISOString(),
+        date: draft.date
       },
       ...items
     ]);
-    setDraft({ caption: '', center: '', activity: '', file: null });
+    setDraft({ caption: '', center: '', activity: '', date: today(), file: null });
   };
 
   return (
@@ -74,6 +87,10 @@ export function GalleryPage({ photos, setPhotos }) {
             <span>Activity</span>
             <input value={draft.activity} onChange={(event) => setDraft((current) => ({ ...current, activity: event.target.value }))} />
           </label>
+          <label>
+            <span>Activity date</span>
+            <input type="date" value={draft.date} onChange={(event) => setDraft((current) => ({ ...current, date: event.target.value }))} />
+          </label>
           <small>
             Cloudinary readiness: {config.cloudName && config.uploadPreset ? 'configured' : 'missing public upload values'}
           </small>
@@ -88,11 +105,11 @@ export function GalleryPage({ photos, setPhotos }) {
         </form>
         <div className="gallery-grid">
           {photos.length ? photos.map((photo) => (
-            <figure className="photo-card" key={photo.id}>
+            <figure className="photo-card" key={photo.id || photo._id}>
               <img src={photo.imageUrl} alt={photo.caption} />
               <figcaption>
                 <strong>{photo.caption}</strong>
-                <span>{photo.center} · {photo.activity} · {photo.date}</span>
+                <span>{photo.center || photo.centerId || 'Unassigned center'} / {photo.activity || 'Activity proof'} / {displayPhotoDate(photo)}</span>
               </figcaption>
             </figure>
           )) : <EmptyState title="No uploaded activity photos yet" text="Add one photo proof to see the gallery hierarchy and report linkage work." />}

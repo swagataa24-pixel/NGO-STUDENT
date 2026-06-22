@@ -1525,6 +1525,31 @@ button:focus-visible,
   margin-bottom: 0;
 }
 
+.attendance-start-controls {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: flex-end;
+}
+
+.attendance-start-controls .class-picker {
+  min-width: 180px;
+}
+
+.inline-proof-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 252, 247, 0.86), rgba(224, 235, 231, 0.68)),
+    radial-gradient(circle at top right, rgba(151, 179, 174, 0.22), transparent 32%);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 22px;
+  box-shadow: var(--inner);
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
 .segmented-status {
   background: rgba(255, 252, 247, 0.72);
   border-radius: 999px;
@@ -2550,6 +2575,15 @@ figcaption span {
     flex-direction: column;
   }
 
+  .attendance-start-controls {
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .attendance-start-controls .class-picker {
+    flex: 1 1 220px;
+  }
+
   .class-summary-card {
     align-items: start;
     flex-direction: column;
@@ -2698,10 +2732,15 @@ figcaption span {
   }
 
   .filter-bar,
+  .attendance-start-controls,
   .button-row,
   .split {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .attendance-start-controls .class-picker {
+    width: 100%;
   }
 
   .swipe-stage {
