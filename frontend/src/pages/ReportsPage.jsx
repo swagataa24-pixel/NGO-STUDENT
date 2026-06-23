@@ -65,7 +65,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
     : classGroups.filter(c => c.name === className);
 
   return (
-    <section className="section tinted theme-admin-dark reports-page">
+    <section className="section reports-page">
       <div className="container page-hero reports-hero">
         <div className="reports-hero-copy">
           <span className="eyebrow">Analytics</span>
@@ -182,21 +182,22 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
                 <BarChart data={chartData}>
                   <defs>
                     <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2DD4BF" stopOpacity={1}/>
-                      <stop offset="100%" stopColor="#123C34" stopOpacity={0.7}/>
+                      <stop offset="0%" stopColor="#123C34" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#A68D71" stopOpacity={0.7}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(45, 212, 191, 0.1)" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: '#A6A6B4' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#A6A6B4' }} axisLine={false} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(18, 60, 52, 0.1)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: '#5A5A57' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#5A5A57' }} axisLine={false} tickLine={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1E1E2A',
-                      border: '1px solid rgba(45, 212, 191, 0.3)',
-                      borderRadius: '8px',
-                      color: '#E2E2E8'
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid rgba(18, 60, 52, 0.14)',
+                      borderRadius: '12px',
+                      color: '#1A1A1A',
+                      boxShadow: '0 18px 40px -28px rgba(18, 60, 52, 0.45)'
                     }}
-                    cursor={{ fill: 'rgba(45, 212, 191, 0.05)' }}
+                    cursor={{ fill: 'rgba(18, 60, 52, 0.04)' }}
                   />
                   <Bar
                     dataKey="attendance"
