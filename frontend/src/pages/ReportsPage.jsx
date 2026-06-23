@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Eye, X, Users, ArrowLeft } from 'lucide-react';
+import { BarChart3, CalendarDays, Download, Eye, FileText, Filter, Users, X } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -57,6 +57,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
   const chartData = filteredStudents.map((student) => ({ name: student.name.split(' ')[0], attendance: percent(student) }));
   const report = buildReportSummary(filteredStudents, filteredPhotos, volunteers);
   const hasReportData = filteredStudents.length > 0 || filteredPhotos.length > 0 || volunteers.length > 0;
+  const reportTitle = reportType === 'monthly' ? formatMonth(month) : reportType === 'yearly' ? `${year} Yearly` : 'Overall';
 
   // Get unique classes for the class-based view
   const uniqueClasses = className === 'all'
@@ -64,29 +65,53 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
     : classGroups.filter(c => c.name === className);
 
   return (
-    <section className="section tinted theme-admin-dark">
-      <div className="container page-hero with-action">
-        <div>
+    <section className="section tinted theme-admin-dark reports-page">
+      <div className="container page-hero reports-hero">
+        <div className="reports-hero-copy">
           <span className="eyebrow">Analytics</span>
-          <h2>Consolidated operational reviews, attendance metrics, and compliance audits.</h2>
-          <p>Specify month or year and class scope to export audited PDF reports and view administrative data tables.</p>
+          <h2>Reports dashboard</h2>
+          <p>Review class attendance, intervention alerts, volunteer contribution, and activity proof in one export-ready workspace.</p>
         </div>
-        <div className="filter-bar">
-          <select value={reportType} onChange={(event) => setReportType(event.target.value)}>
-            <option value="monthly">Monthly Report</option>
-            <option value="yearly">Yearly Report</option>
-            <option value="overall">Overall Report</option>
-          </select>
-          {reportType === 'monthly' ? (
-            <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />
-          ) : reportType === 'yearly' ? (
-            <input type="number" value={year} onChange={(event) => setYear(event.target.value)} placeholder="Year" />
-          ) : null}
-          <select value={className} onChange={(event) => setClassName(event.target.value)}>
-            {classOptions.map((item) => <option key={item} value={item}>{item === 'all' ? 'All classes' : item}</option>)}
-          </select>
+
+        <div className="reports-control-panel" aria-label="Report filters">
+          <div className="reports-control-title">
+            <Filter size={18} />
+            <span>Report settings</span>
+          </div>
+          <div className="reports-control-grid">
+            <label>
+              <span>Report type</span>
+              <select value={reportType} onChange={(event) => setReportType(event.target.value)}>
+                <option value="monthly">Monthly Report</option>
+                <option value="yearly">Yearly Report</option>
+                <option value="overall">Overall Report</option>
+              </select>
+            </label>
+            {reportType === 'monthly' ? (
+              <label>
+                <span>Month</span>
+                <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />
+              </label>
+            ) : reportType === 'yearly' ? (
+              <label>
+                <span>Year</span>
+                <input type="number" value={year} onChange={(event) => setYear(event.target.value)} placeholder="Year" />
+              </label>
+            ) : (
+              <div className="reports-control-note">
+                <CalendarDays size={18} />
+                <span>All available records</span>
+              </div>
+            )}
+            <label>
+              <span>Class</span>
+              <select value={className} onChange={(event) => setClassName(event.target.value)}>
+                {classOptions.map((item) => <option key={item} value={item}>{item === 'all' ? 'All classes' : item}</option>)}
+              </select>
+            </label>
+          </div>
           <button
-            className="secondary-button"
+            className="primary-button reports-download-button"
             onClick={() => downloadMonthlyReportPdf({ students: filteredStudents, photos: filteredPhotos, volunteers, month: reportType === 'monthly' ? month : year, center: '', className })}
           >
             <Download size={18} /> Download PDF
@@ -95,7 +120,14 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
       </div>
 
       {uniqueClasses.length > 0 && (
-        <div className="container">
+        <div className="container reports-section">
+          <div className="reports-section-heading">
+            <div>
+              <span className="eyebrow">Class scope</span>
+              <h3>{className === 'all' ? 'All active classes' : className}</h3>
+            </div>
+            <span className="reports-pill">{uniqueClasses.length} {uniqueClasses.length === 1 ? 'class' : 'classes'}</span>
+          </div>
           <div className="reports-class-grid">
             {uniqueClasses.map((classItem) => {
               const classStudents = students.filter(s => s.classId === mongoId(classItem) || s.className === classItem.name);
@@ -107,6 +139,14 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
                   key={mongoId(classItem)}
                   className="class-card"
                   onClick={() => navigate(`${config.routes.students}/${mongoId(classItem)}`)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      navigate(`${config.routes.students}/${mongoId(classItem)}`);
+                    }
+                  }}
                 >
                   <div className="class-card-header">
                     <div className="class-card-icon"><Users size={24} /></div>
@@ -117,8 +157,8 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
                   </div>
                   {classItem.description && <p className="class-card-description">{classItem.description}</p>}
                   <div className="class-card-footer">
-                    <span className="class-card-count">{classStudents.length} Students</span>
-                    <span className="class-card-count">{avgAttendance}% Avg Attendance</span>
+                    <span><strong>{classStudents.length}</strong> Students</span>
+                    <span><strong>{avgAttendance}%</strong> Avg attendance</span>
                   </div>
                 </div>
               );
@@ -128,10 +168,16 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
       )}
 
       {hasReportData ? (
-        <div className="container report-layout">
+        <div className="container report-layout reports-section">
           {filteredStudents.length ? (
             <div className="chart-card">
-              <h3>{reportType === 'monthly' ? formatMonth(month) : reportType === 'yearly' ? `${year} Yearly` : 'Overall'} Attendance Breakdown</h3>
+              <div className="reports-card-heading">
+                <div>
+                  <span className="eyebrow">Attendance</span>
+                  <h3>{reportTitle} breakdown</h3>
+                </div>
+                <BarChart3 size={22} />
+              </div>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <defs>
@@ -167,6 +213,12 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
             <EmptyState title="No attendance graph yet" text="Select a class with attendance records to show chart details." />
           )}
           <div className="report-cards">
+            <div className="report-summary-card">
+              <FileText size={20} />
+              <span>Current view</span>
+              <strong>{reportTitle}</strong>
+              <p>{className === 'all' ? 'All classes included' : className}</p>
+            </div>
             {uniqueClasses.length > 0 && <Metric value={uniqueClasses.length} label="total classes" />}
             {filteredStudents.length > 0 && <Metric value={`${filteredStudents.length}`} label="student records" />}
             {filteredStudents.length > 0 && <Metric value={`${report.averageAttendance}%`} label="average attendance" />}
@@ -181,9 +233,14 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         </div>
       )}
 
-      {hasReportData && <div className="container formal-report-preview">
+      {hasReportData && <div className="container formal-report-preview reports-section">
         <div className="table-card">
-          <h3>Student Attendance Table</h3>
+          <div className="reports-card-heading">
+            <div>
+              <span className="eyebrow">Records</span>
+              <h3>Student Attendance</h3>
+            </div>
+          </div>
           {filteredStudents.length ? (
             <ResponsiveTable
               headers={['Student', 'Class', 'Attended', 'Total Classes', 'Attendance', 'Status']}
@@ -205,7 +262,12 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         </div>
         {report.interventionStudents.length > 0 && (
           <div className="table-card">
-            <h3>Student Support Table</h3>
+            <div className="reports-card-heading">
+              <div>
+                <span className="eyebrow">Support</span>
+                <h3>Intervention Watchlist</h3>
+              </div>
+            </div>
             <ResponsiveTable
               headers={['Student', 'Guardian', 'Contact', 'Latest Note']}
               rows={report.interventionStudents.map((student) => [
@@ -219,7 +281,12 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         )}
         {volunteers.length > 0 && (
           <div className="table-card">
-            <h3>Volunteer Contribution Table</h3>
+            <div className="reports-card-heading">
+              <div>
+                <span className="eyebrow">People</span>
+                <h3>Volunteer Contribution</h3>
+              </div>
+            </div>
             <ResponsiveTable
               headers={['Volunteer', 'Role', 'Availability', 'Hours']}
               rows={volunteers.map((volunteer) => [
@@ -233,7 +300,12 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         )}
         {filteredPhotos.length > 0 && (
           <div className="table-card">
-            <h3>Activity Photo Proof Table</h3>
+            <div className="reports-card-heading">
+              <div>
+                <span className="eyebrow">Evidence</span>
+                <h3>Activity Photo Proof</h3>
+              </div>
+            </div>
             <ResponsiveTable
               headers={['Date', 'Activity', 'Caption', 'Image']}
               rows={filteredPhotos.map((photo) => [
