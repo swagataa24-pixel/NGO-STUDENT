@@ -1,5 +1,4 @@
 /* ReportsPage Styles */
-
 .reports-class-grid {
   display: grid;
   gap: 1.5rem;
@@ -7,26 +6,93 @@
   margin-bottom: 2rem;
 }
 
-.report-layout {
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  align-items: start;
-}
-
-.chart-card {
+.class-card {
   background: var(--bg-secondary);
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
-  padding: 1.5rem;
+  cursor: pointer;
+  padding: 1.8rem;
+  transition: all 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.chart-card h3 {
-  font-family: var(--font-serif), serif;
+.class-card:hover {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(166, 141, 113, 0.2);
+}
+
+.class-card-header {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.class-card-icon {
+  background: linear-gradient(135deg, #97B3AE 0%, #123C34 100%);
+  border-radius: 50%;
+  display: grid;
+  height: 48px;
+  place-items: center;
+  width: 48px;
+}
+
+.class-card-icon svg {
+  color: white;
+}
+
+.class-card-info h3 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.class-card-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.class-card-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.class-card-count {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.report-layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 2fr 1fr;
+  margin-bottom: 2rem;
+}
+
+.chart-card,
+.table-card {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  padding: 1.8rem;
+  transition: all 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.chart-card:hover,
+.table-card:hover {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-4px);
+  border-color: rgba(166, 141, 113, 0.15);
+}
+
+.chart-card h3,
+.table-card h3 {
+  font-family: var(--font-serif);
   font-size: 1.6rem;
-  font-weight: 400;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
 }
 
 .report-cards {
@@ -41,11 +107,6 @@
 }
 
 .table-card h3 {
-  font-family: var(--font-serif), serif;
-  font-size: 1.6rem;
-  font-weight: 400;
-  margin-top: 0;
-  margin-bottom: 1.2rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding-bottom: 0.8rem;
 }
@@ -122,6 +183,43 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+/* Dark theme support */
+.theme-admin-dark .class-card {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .chart-card,
+.theme-admin-dark .table-card {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .table-card h3 {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+/* Recharts customization for dark theme */
+.recharts-wrapper {
+  font-family: var(--font-sans);
+}
+
+.theme-admin-dark .recharts-cartesian-grid line {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.theme-admin-dark .recharts-text {
+  fill: var(--text-secondary);
+}
+
+.theme-admin-dark .recharts-tooltip-wrapper {
+  background: var(--bg-tint);
+  border-color: rgba(45, 212, 191, 0.3);
+}
+
+.theme-admin-dark .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--bg-tint);
+  border-color: rgba(45, 212, 191, 0.3);
 }
 
 /* Print Styles integrated */

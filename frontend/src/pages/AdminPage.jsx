@@ -123,11 +123,11 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
   };
 
   return (
-    <section className="section">
+    <section className="section theme-admin-dark">
       <div className="container page-hero with-action">
         <div>
           <span className="eyebrow">Admin Panel</span>
-          <h2>User management and live system overview.</h2>
+          <h2>User Management and Live System Overview</h2>
           <p>Manage accounts, roles, and access. Metrics below are loaded from the backend database.</p>
         </div>
         <button className="secondary-button" type="button" onClick={refreshAll} style={{ minHeight: 36, fontSize: '0.8rem' }}>

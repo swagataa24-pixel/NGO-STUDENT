@@ -166,6 +166,9 @@ export function Layout({ activeUser, onSignOut }) {
         <Outlet />
       </main>
       <footer className="app-footer">
+        <div className="footer-orb footer-orb-1"></div>
+        <div className="footer-orb footer-orb-2"></div>
+        <div className="footer-orb footer-orb-3"></div>
         <div className="container footer-grid">
           <div className="footer-brand-section">
             <strong className="footer-title">UPAY</strong>

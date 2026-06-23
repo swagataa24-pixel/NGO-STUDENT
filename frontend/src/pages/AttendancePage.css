@@ -12,9 +12,16 @@
   gap: 1.2rem;
   background: var(--bg-secondary);
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
-  padding: 1.5rem;
+  padding: 1.8rem;
+  transition: all 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.summary-panel:hover {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-4px);
+  border-color: rgba(166, 141, 113, 0.15);
 }
 
 .summary-panel h3 {
@@ -100,8 +107,8 @@
 .swipe-card {
   background: linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(250,250,249,1) 100%);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-radius: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12), 0 10px 28px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
   cursor: grab;
   display: grid;
   grid-template-columns: 1fr 1.2fr;
@@ -416,6 +423,27 @@ dd {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
+
+  .summary-panel {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-hero.with-action {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-panel h3 {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 640px) {
@@ -428,13 +456,21 @@ dd {
     height: 240px;
   }
 
+  .swipe-card-body {
+    padding: 1.8rem;
+  }
+
+  .swipe-card-body h3 {
+    font-size: 1.8rem;
+  }
+
   .proof-upload-row {
     grid-template-columns: 1fr;
   }
 
   .swipe-zone {
-    font-size: 0.7rem;
-    padding: 0.6rem 0.9rem;
+    font-size: 0.65rem;
+    padding: 0.6rem 0.8rem;
   }
 
   .swipe-zone.left {
@@ -443,5 +479,24 @@ dd {
 
   .swipe-zone.right {
     right: 0.5rem;
+  }
+
+  .swipe-zone svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .review-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .button-row button {
+    flex: 1;
   }
 }

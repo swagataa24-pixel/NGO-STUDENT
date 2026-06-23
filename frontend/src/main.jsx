@@ -38,6 +38,7 @@ const ProgramsPage = lazyRoute(() => import('./pages/ProgramsPage.jsx'), 'Progra
 const StudentsPage = lazyRoute(() => import('./pages/StudentsPage.jsx'), 'StudentsPage');
 const AttendancePage = lazyRoute(() => import('./pages/AttendancePage.jsx'), 'AttendancePage');
 const VolunteersPage = lazyRoute(() => import('./pages/VolunteersPage.jsx'), 'VolunteersPage');
+const VolunteerDetailPage = lazyRoute(() => import('./pages/VolunteerDetailPage.jsx'), 'VolunteerDetailPage');
 const ReportsPage = lazyRoute(() => import('./pages/ReportsPage.jsx'), 'ReportsPage');
 const GalleryPage = lazyRoute(() => import('./pages/GalleryPage.jsx'), 'GalleryPage');
 const AdminPage = lazyRoute(() => import('./pages/AdminPage.jsx'), 'AdminPage');
@@ -132,6 +133,7 @@ function App() {
   const [classes, setClasses] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [photos, setPhotos] = useState([]);
+  const [attendanceSessions, setAttendanceSessions] = useState([]);
   const [activeUser, setActiveUser] = useState(readStoredSession);
   const [dataStatus, setDataStatus] = useState({ loading: true, error: '' });
 
@@ -168,22 +170,25 @@ function App() {
   const refreshData = async () => {
     setDataStatus({ loading: true, error: '' });
     try {
-      const [studentData, classData, photoData, volunteerData] = await Promise.all([
+      const [studentData, classData, photoData, volunteerData, attendanceData] = await Promise.all([
         apiRequest(config.apiRoutes.students),
         apiRequest(config.apiRoutes.classes),
         apiRequest(config.apiRoutes.photos).catch(() => []),
-        apiRequest(config.apiRoutes.volunteers).catch(() => [])
+        apiRequest(config.apiRoutes.volunteers).catch(() => []),
+        apiRequest(config.apiRoutes.attendanceSession).catch(() => [])
       ]);
       setStudents(studentData);
       setClasses(classData);
       setPhotos(photoData);
       setVolunteers(volunteerData);
+      setAttendanceSessions(attendanceData);
       setDataStatus({ loading: false, error: '' });
     } catch (error) {
       setStudents([]);
       setClasses([]);
       setPhotos([]);
       setVolunteers([]);
+      setAttendanceSessions([]);
       setDataStatus({ loading: false, error: `${error.message} Start the API server and configure MongoDB.` });
     }
   };
@@ -256,6 +261,22 @@ function App() {
               }
             />
             <Route
+              path={`${config.routes.volunteers.replace(/^\//, '')}/:volunteerId`}
+              element={
+                <AccessRoute activeUser={activeUser} allowedRoles={['Admin']}>
+                  <VolunteerDetailPage
+                    volunteers={volunteers}
+                    setVolunteers={setVolunteers}
+                    students={students}
+                    classes={classes}
+                    attendanceSessions={attendanceSessions}
+                    dataStatus={dataStatus}
+                    refreshData={refreshData}
+                  />
+                </AccessRoute>
+              }
+            />
+            <Route
               path={config.routes.reports.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
@@ -263,7 +284,7 @@ function App() {
                 </AccessRoute>
               }
             />
-            <Route path={config.routes.gallery.replace(/^\//, '')} element={<GalleryPage photos={photos} setPhotos={setPhotos} />} />
+            <Route path={config.routes.gallery.replace(/^\//, '')} element={<GalleryPage photos={photos} setPhotos={setPhotos} classes={classes} />} />
             <Route
               path={config.routes.admin.replace(/^\//, '')}
               element={

@@ -31,3 +31,14 @@
   letter-spacing: 0.08em;
   margin-top: 0.6rem;
 }
+
+/* Dark theme override for Metric */
+.theme-admin-dark .metric-card {
+  background: var(--bg-secondary);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .metric-card:hover {
+  border-color: rgba(45, 212, 191, 0.4);
+  box-shadow: 0 16px 40px -12px rgba(45, 212, 191, 0.3);
+}

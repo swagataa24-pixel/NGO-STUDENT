@@ -41,11 +41,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
 
   const classOptions = [
     'all',
-    ...new Set([
-      ...classGroups.map((item) => item.name),
-      ...students.map((student) => student.className),
-      ...photos.map((photo) => photo.className).filter(Boolean)
-    ])
+    ...new Set(classGroups.map((item) => item.name))
   ];
 
   const filteredStudents = students.filter((student) => {
@@ -68,7 +64,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
     : classGroups.filter(c => c.name === className);
 
   return (
-    <section className="section tinted">
+    <section className="section tinted theme-admin-dark">
       <div className="container page-hero with-action">
         <div>
           <span className="eyebrow">Analytics</span>
@@ -79,12 +75,13 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
           <select value={reportType} onChange={(event) => setReportType(event.target.value)}>
             <option value="monthly">Monthly Report</option>
             <option value="yearly">Yearly Report</option>
+            <option value="overall">Overall Report</option>
           </select>
           {reportType === 'monthly' ? (
             <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />
-          ) : (
+          ) : reportType === 'yearly' ? (
             <input type="number" value={year} onChange={(event) => setYear(event.target.value)} placeholder="Year" />
-          )}
+          ) : null}
           <select value={className} onChange={(event) => setClassName(event.target.value)}>
             {classOptions.map((item) => <option key={item} value={item}>{item === 'all' ? 'All classes' : item}</option>)}
           </select>
@@ -134,14 +131,35 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
         <div className="container report-layout">
           {filteredStudents.length ? (
             <div className="chart-card">
-              <h3>{reportType === 'monthly' ? formatMonth(month) : `${year} Yearly`} Attendance Breakdown</h3>
-              <ResponsiveContainer width="100%" height={260}>
+              <h3>{reportType === 'monthly' ? formatMonth(month) : reportType === 'yearly' ? `${year} Yearly` : 'Overall'} Attendance Breakdown</h3>
+              <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#d6cbbf" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="attendance" fill="#97B3AE" radius={[8, 8, 0, 0]} />
+                  <defs>
+                    <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2DD4BF" stopOpacity={1}/>
+                      <stop offset="100%" stopColor="#123C34" stopOpacity={0.7}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(45, 212, 191, 0.1)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: '#A6A6B4' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#A6A6B4' }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1E1E2A',
+                      border: '1px solid rgba(45, 212, 191, 0.3)',
+                      borderRadius: '8px',
+                      color: '#E2E2E8'
+                    }}
+                    cursor={{ fill: 'rgba(45, 212, 191, 0.05)' }}
+                  />
+                  <Bar
+                    dataKey="attendance"
+                    fill="url(#colorAttendance)"
+                    radius={[12, 12, 4, 4]}
+                    animationDuration={1500}
+                    animationEasing="ease-out"
+                    barSize={40}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -149,7 +167,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
             <EmptyState title="No attendance graph yet" text="Select a class with attendance records to show chart details." />
           )}
           <div className="report-cards">
-            {report.totalClasses > 0 && <Metric value={report.totalClasses} label="total classes" />}
+            {uniqueClasses.length > 0 && <Metric value={uniqueClasses.length} label="total classes" />}
             {filteredStudents.length > 0 && <Metric value={`${filteredStudents.length}`} label="student records" />}
             {filteredStudents.length > 0 && <Metric value={`${report.averageAttendance}%`} label="average attendance" />}
             {report.interventionStudents.length > 0 && <Metric value={`${report.interventionStudents.length}`} label="intervention alerts" />}

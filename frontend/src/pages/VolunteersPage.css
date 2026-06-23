@@ -81,6 +81,8 @@
   margin-bottom: 0.45rem;
   padding: 0.65rem 0.75rem;
   text-align: left;
+  text-decoration: none;
+  color: inherit;
   transition: all 180ms ease;
   width: 100%;
 }
@@ -297,4 +299,63 @@
   .volunteer-summary-stats {
     width: 100%;
   }
+}
+
+/* Dark theme overrides for VolunteersPage */
+.theme-admin-dark .volunteer-list-card,
+.theme-admin-dark .volunteer-panel-card,
+.theme-admin-dark .volunteer-detail-card {
+  background: var(--bg-secondary);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .volunteer-list-item {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.theme-admin-dark .volunteer-list-item:hover,
+.theme-admin-dark .volunteer-list-item.active {
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.3);
+}
+
+.theme-admin-dark .volunteer-summary-stats {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .detail-table-wrap {
+  border-radius: var(--radius-lg);
+}
+
+.theme-admin-dark .detail-table th {
+  color: var(--text-muted);
+}
+
+.theme-admin-dark .detail-table th,
+.theme-admin-dark .detail-table td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.theme-admin-dark .search-box {
+  background: var(--bg-tint);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-admin-dark .search-box input {
+  background: transparent;
+  border: none;
+}
+
+.theme-admin-dark .volunteer-form-grid input,
+.theme-admin-dark .volunteer-form-grid select {
+  background: var(--bg-tint);
+}
+
+.theme-admin-dark .search-box:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.15);
+}
+
+.theme-admin-dark .search-box svg {
+  color: var(--text-muted);
 }

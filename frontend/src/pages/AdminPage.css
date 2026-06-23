@@ -260,3 +260,72 @@
   .user-email { display: none; }
 }
 
+/* Dark theme overrides for AdminPage */
+.theme-admin-dark .readiness-card {
+  background: var(--bg-secondary);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .readiness-row {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.theme-admin-dark .readiness-card h3 {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .users-table-wrap {
+  background: var(--bg-secondary);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .users-table th {
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-admin-dark .users-table td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.theme-admin-dark .role-select {
+  background: var(--bg-tint);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-admin-dark .status-badge.active {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34D399;
+}
+
+.theme-admin-dark .status-badge.blocked {
+  background: rgba(248, 113, 113, 0.2);
+  color: #F87171;
+}
+
+.theme-admin-dark .inline-edit {
+  background: var(--bg-tint);
+  border-color: var(--color-primary);
+}
+
+.theme-admin-dark .act-btn.edit:hover:not(:disabled),
+.theme-admin-dark .act-btn.cancel:hover {
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.theme-admin-dark .act-btn.save:hover:not(:disabled) {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+.theme-admin-dark .act-btn.block:hover:not(:disabled) {
+  background: rgba(252, 211, 77, 0.2);
+}
+
+.theme-admin-dark .act-btn.unblock:hover:not(:disabled) {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+.theme-admin-dark .act-btn.delete:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.2);
+}
+

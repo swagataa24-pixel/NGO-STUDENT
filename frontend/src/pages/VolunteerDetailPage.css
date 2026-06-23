@@ -1,0 +1,175 @@
+.volunteer-hero-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.link-button {
+  align-items: center;
+  color: var(--color-primary);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 0.25rem;
+  text-decoration: none;
+  transition: all 180ms ease;
+}
+
+.link-button:hover {
+  color: var(--color-secondary);
+}
+
+.volunteer-detail-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.volunteer-panel-card,
+.volunteer-detail-card {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.2rem;
+}
+
+.volunteer-summary-stats {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(4, minmax(70px, 1fr));
+  margin-bottom: 1rem;
+  padding: 1rem 0;
+}
+
+.volunteer-summary-stats strong {
+  display: block;
+  font-family: var(--font-serif), serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.volunteer-summary-stats span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.volunteer-contact-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.volunteer-contact-grid span {
+  color: var(--text-muted);
+  display: block;
+  font-size: 0.72rem;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+}
+
+.detail-card-heading {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.detail-card-heading h4 {
+  font-family: var(--font-serif), serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin: 0.2rem 0 0;
+}
+
+.detail-card-heading span {
+  background: var(--bg-tint);
+  border-radius: 999px;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+}
+
+.detail-table-wrap {
+  overflow-x: auto;
+}
+
+.detail-table {
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  width: 100%;
+}
+
+.detail-table th,
+.detail-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.65rem 0.4rem;
+  text-align: left;
+}
+
+.detail-table th {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detail-empty {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.detail-empty a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.danger-button {
+  border-color: rgba(200, 30, 30, 0.2);
+  color: var(--risk-fg);
+}
+
+.danger-button:hover {
+  background: var(--risk-bg);
+  border-color: var(--risk-fg);
+}
+
+@media (max-width: 1040px) {
+  .volunteer-detail-grid,
+  .volunteer-contact-grid,
+  .volunteer-summary-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark theme overrides for VolunteerDetailPage */
+.theme-admin-dark .volunteer-panel-card,
+.theme-admin-dark .volunteer-detail-card {
+  background: var(--bg-secondary);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .volunteer-summary-stats {
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.theme-admin-dark .detail-table-wrap {
+  border-radius: var(--radius-lg);
+}
+
+.theme-admin-dark .detail-table th,
+.theme-admin-dark .detail-table td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.theme-admin-dark .link-button:hover {
+  color: var(--color-accent);
+}

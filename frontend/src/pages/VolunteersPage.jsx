@@ -282,7 +282,7 @@ export function VolunteersPage({
   );
 
   return (
-    <section className="section">
+    <section className="section theme-admin-dark">
       <div className="container page-hero with-action">
         <div>
           <span className="eyebrow">Admin Panel</span>
@@ -325,11 +325,10 @@ export function VolunteersPage({
               const linkedClasses = classes.filter((classItem) => matchesTeacher(classItem, volunteer.name));
               const isActive = selectedVolunteerId === id && panelMode === 'view';
               return (
-                <button
+                <Link
                   key={id}
-                  type="button"
+                  to={`${config.routes.volunteers}/${id}`}
                   className={isActive ? 'volunteer-list-item active' : 'volunteer-list-item'}
-                  onClick={() => openView(id)}
                 >
                   <Users size={18} />
                   <span>
@@ -338,7 +337,7 @@ export function VolunteersPage({
                       {volunteer.role || 'Volunteer'} · {linkedClasses.length} class{linkedClasses.length === 1 ? '' : 'es'}
                     </small>
                   </span>
-                </button>
+                </Link>
               );
             })}
 
