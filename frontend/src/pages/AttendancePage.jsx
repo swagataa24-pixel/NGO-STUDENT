@@ -28,16 +28,13 @@ const readFileAsDataUrl = (file) =>
   });
 
 export function AttendancePage({ students, setStudents, classes: classGroups = [], setPhotos }) {
+  const activeClassGroups = useMemo(
+    () => classGroups.filter((item) => item.activeStatus !== false && item.active !== false),
+    [classGroups]
+  );
   const classNames = useMemo(
-    () =>
-      sortClasses(
-        new Set(
-          classGroups.length
-            ? classGroups.map((item) => item.name)
-            : students.filter((student) => student.activeStatus !== false && student.active !== false).map((student) => student.className)
-        )
-      ),
-    [classGroups, students]
+    () => sortClasses(new Set(activeClassGroups.map((item) => item.name))),
+    [activeClassGroups]
   );
   const [selectedClass, setSelectedClass] = useState(classNames[0] || '');
   const [sessionDate, setSessionDate] = useState(new Date().toISOString().slice(0, 10));
@@ -50,7 +47,11 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
   const [linkedPhoto, setLinkedPhoto] = useState(null);
 
   useEffect(() => {
-    if (!selectedClass && classNames.length) {
+    if (!classNames.length) {
+      if (selectedClass) resetSession('');
+      return;
+    }
+    if (!selectedClass || !classNames.includes(selectedClass)) {
       setSelectedClass(classNames[0]);
     }
   }, [classNames, selectedClass]);
@@ -66,7 +67,16 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
     return () => URL.revokeObjectURL(objectUrl);
   }, [proofFile]);
 
-  const roster = students.filter((student) => student.activeStatus !== false && student.active !== false && student.className === selectedClass);
+  const selectedClassGroup = activeClassGroups.find((item) => item.name === selectedClass);
+  const selectedClassId = selectedClassGroup ? mongoId(selectedClassGroup) : '';
+  const roster = selectedClassGroup
+    ? students.filter((student) => {
+        const active = student.activeStatus !== false && student.active !== false;
+        const classIdMatch = student.classId && String(student.classId) === selectedClassId;
+        const legacyNameMatch = !student.classId && student.className === selectedClassGroup.name;
+        return active && (classIdMatch || legacyNameMatch);
+      })
+    : [];
   const current = roster[index];
   const present = records.filter((record) => record.status === 'present').length;
   const absent = records.filter((record) => record.status === 'absent').length;
@@ -124,6 +134,7 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
 
     const payload = {
       centerId: roster[0]?.centerId || config.defaultCenter,
+      classId: selectedClassId,
       className: selectedClass,
       teacherId: 'demo-teacher',
       date: new Date(`${sessionDate}T12:00:00`).toISOString(),
@@ -150,6 +161,7 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
         caption: `${selectedClass} class proof`,
         center: roster[0]?.center || roster[0]?.centerId || config.defaultCenter,
         centerId: session.centerId || roster[0]?.centerId || config.defaultCenter,
+        classId: selectedClassId,
         className: selectedClass,
         activity: 'Attendance class proof',
         activityDate: payload.date,
@@ -212,9 +224,13 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
           <label className="class-picker">
             <span>Class</span>
             <select value={selectedClass} onChange={(event) => resetSession(event.target.value)} disabled={Boolean(records.length)}>
-              {classNames.map((className) => (
-                <option value={className} key={className}>{className}</option>
-              ))}
+              {classNames.length ? (
+                classNames.map((className) => (
+                  <option value={className} key={className}>{className}</option>
+                ))
+              ) : (
+                <option value="">No active classes</option>
+              )}
             </select>
           </label>
         </div>

@@ -5,14 +5,17 @@ import mongoose from 'mongoose';
 export async function listAttendance(filters = {}) {
   const query = {};
   if (filters.centerId) query.centerId = filters.centerId;
+  if (filters.classId && mongoose.isValidObjectId(filters.classId)) query.classId = filters.classId;
   if (filters.className) query.className = filters.className;
   return AttendanceSession.find(query).sort({ date: -1 });
 }
 
 export async function createSession(payload) {
   const records = payload.records || [];
+  const { classId, ...sessionPayload } = payload;
   const session = await AttendanceSession.create({
-    ...payload,
+    ...sessionPayload,
+    ...(mongoose.isValidObjectId(classId) ? { classId } : {}),
     totalStudents: payload.totalStudents ?? records.length,
     presentCount: payload.presentCount ?? records.filter((record) => record.status === 'present').length,
     absentCount: payload.absentCount ?? records.filter((record) => record.status === 'absent').length,

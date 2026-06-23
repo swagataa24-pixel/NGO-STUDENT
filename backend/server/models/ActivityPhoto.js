@@ -6,12 +6,13 @@ const activityPhotoSchema = new mongoose.Schema(
     cloudinaryPublicId: String,
     caption: String,
     center: String,
+    classId: { type: mongoose.Schema.Types.ObjectId, ref: 'ClassGroup' },
     className: String,
     activity: String,
     uploadedBy: String,
     centerId: String,
     activityDate: Date,
-    relatedSessionId: String
+    relatedSessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'AttendanceSession' }
   },
   { timestamps: true }
 );

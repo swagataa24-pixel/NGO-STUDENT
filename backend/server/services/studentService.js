@@ -1,5 +1,6 @@
 import { Student } from '../models/Student.js';
 import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
+import mongoose from 'mongoose';
 
 async function processPhotoUrl(photoUrl) {
   if (photoUrl && photoUrl.startsWith('data:') && isCloudinaryConfigured()) {
@@ -13,6 +14,14 @@ async function processPhotoUrl(photoUrl) {
   return photoUrl;
 }
 
+function normalizeStudentPayload(payload) {
+  const next = { ...payload };
+  if (!mongoose.isValidObjectId(next.classId)) {
+    delete next.classId;
+  }
+  return next;
+}
+
 export async function listStudents(filters = {}) {
   const query = {};
   if (filters.centerId) query.centerId = filters.centerId;
@@ -21,6 +30,7 @@ export async function listStudents(filters = {}) {
 }
 
 export async function createStudent(payload) {
+  payload = normalizeStudentPayload(payload);
   if (payload.photoUrl) {
     payload.photoUrl = await processPhotoUrl(payload.photoUrl);
   }
@@ -32,6 +42,7 @@ export async function getStudent(id) {
 }
 
 export async function updateStudent(id, payload) {
+  payload = normalizeStudentPayload(payload);
   if (payload.photoUrl) {
     payload.photoUrl = await processPhotoUrl(payload.photoUrl);
   }

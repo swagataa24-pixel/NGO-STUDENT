@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const attendanceRecordSchema = new mongoose.Schema(
   {
-    studentId: { type: String, required: true },
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
     status: { type: String, enum: ['present', 'absent', 'skipped'], required: true },
     note: String,
     recordedAt: { type: Date, default: Date.now }
@@ -13,6 +13,7 @@ const attendanceRecordSchema = new mongoose.Schema(
 const attendanceSessionSchema = new mongoose.Schema(
   {
     centerId: String,
+    classId: { type: mongoose.Schema.Types.ObjectId, ref: 'ClassGroup' },
     className: String,
     teacherId: String,
     date: { type: Date, default: Date.now },

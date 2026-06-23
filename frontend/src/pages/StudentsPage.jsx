@@ -162,14 +162,23 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
   };
 
   const deleteClass = async (classId) => {
+    const classToDelete = classes.find((item) => mongoId(item) === classId);
     setSaveState('Deleting class...');
     try {
       await apiRequest(`${config.apiRoutes.classes}/${classId}`, { method: 'DELETE' });
       setClasses((items) => items.filter((item) => mongoId(item) !== classId));
+      setStudents((items) =>
+        items.filter((student) => {
+          const sameClassId = student.classId && String(student.classId) === classId;
+          const sameClassName = classToDelete?.name && student.className === classToDelete.name;
+          return !sameClassId && !sameClassName;
+        })
+      );
       if (selectedClassId === classId) setSelectedClassId(null);
       setEditingClassId(null);
       setClassForm(emptyClass);
       setSaveState('Class deleted.');
+      refreshData?.();
     } catch (error) {
       setSaveState(error.message);
     }

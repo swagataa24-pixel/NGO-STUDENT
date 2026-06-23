@@ -40,9 +40,9 @@ export async function archive(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
-    const classGroup = await classService.deleteClass(req.params.id);
-    if (!classGroup) throw httpError(404, 'Class not found.');
-    res.json({ message: 'Class deleted successfully.', classGroup });
+    const result = await classService.deleteClass(req.params.id);
+    if (!result) throw httpError(404, 'Class not found.');
+    res.json({ message: 'Class and related records deleted successfully.', ...result });
   } catch (error) {
     next(error);
   }

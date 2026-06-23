@@ -1,5 +1,6 @@
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
 import { buildCloudinaryStubUpload, describeCloudinaryStatus, isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
+import mongoose from 'mongoose';
 
 export async function listPhotos(filters = {}) {
   const query = filters.centerId ? { centerId: filters.centerId } : {};
@@ -25,12 +26,13 @@ export async function createPhoto(payload) {
     cloudinaryPublicId,
     caption: payload.caption || '',
     center: payload.center || '',
+    ...(mongoose.isValidObjectId(payload.classId) ? { classId: payload.classId } : {}),
     className: payload.className || '',
     activity: payload.activity || '',
     uploadedBy: payload.uploadedBy || '',
     centerId: payload.centerId || '',
     activityDate: payload.activityDate || new Date(),
-    relatedSessionId: payload.relatedSessionId || ''
+    ...(mongoose.isValidObjectId(payload.relatedSessionId) ? { relatedSessionId: payload.relatedSessionId } : {})
   };
 
   const created = await ActivityPhoto.create(record);

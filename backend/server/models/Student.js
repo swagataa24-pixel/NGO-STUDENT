@@ -23,7 +23,7 @@ const studentSchema = new mongoose.Schema(
     age:             Number,
     gender:          String,
     className:       String,
-    classId:         String,
+    classId:         { type: mongoose.Schema.Types.ObjectId, ref: 'ClassGroup' },
     guardianName:    String,                              // encrypted
     guardianContact: String,                              // encrypted
     attendanceStats: {
