@@ -1,7 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 
-export async function requireAuth(req, res, next) {
+// Wrapper to handle async middleware errors
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+export const requireAuth = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
   if (!token) return res.status(401).json({ message: 'Authentication required.' });
@@ -21,7 +26,7 @@ export async function requireAuth(req, res, next) {
   } catch {
     res.status(401).json({ message: 'Invalid or expired token.' });
   }
-}
+});
 
 export function requireRole(...roles) {
   return (req, res, next) => {

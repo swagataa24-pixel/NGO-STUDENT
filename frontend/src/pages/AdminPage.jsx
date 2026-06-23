@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AlertCircle, Check, Edit2, Trash2, ShieldOff, ShieldCheck, X, Save } from 'lucide-react';
+import { AlertCircle, Check, Trash2, ShieldOff, ShieldCheck } from 'lucide-react';
 import './AdminPage.css';
 import { Metric } from '../components/Metric.jsx';
 import { config } from '../config.js';
@@ -13,7 +13,6 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState('');
-  const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState('');
   const [deleting, setDeleting] = useState('');
   const [health, setHealth] = useState(null);
@@ -90,23 +89,6 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
     }
   };
 
-  const saveEdit = async () => {
-    if (!editing) return;
-    setSaving(editing.id);
-    try {
-      const data = await apiRequest(`${config.apiRoutes.users}/${editing.id}/details`, {
-        method: 'PATCH',
-        body: JSON.stringify({ name: editing.name, email: editing.email })
-      });
-      setUsers((prev) => prev.map((user) => (user._id === editing.id ? { ...user, name: data.name, email: data.email } : user)));
-      setEditing(null);
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setSaving('');
-    }
-  };
-
   const readiness = health?.readiness
     ? [
         ['MongoDB', health.readiness.mongo],
@@ -123,7 +105,7 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
   };
 
   return (
-    <section className="section theme-admin-dark">
+    <section className="section">
       <div className="container page-hero with-action">
         <div>
           <span className="eyebrow">Admin Panel</span>
@@ -209,32 +191,14 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
                   const isMe = user._id === activeUser?.id || user._id === activeUser?._id || user.email === activeUser?.email;
                   const isSaving = saving === user._id;
                   const isDeleting = deleting === user._id;
-                  const isEditing = editing?.id === user._id;
 
                   return (
                     <tr key={user._id} className={user.isBlocked ? 'row-blocked' : ''}>
                       <td>
-                        {isEditing ? (
-                          <input
-                            className="inline-edit"
-                            value={editing.name}
-                            onChange={(event) => setEditing((value) => ({ ...value, name: event.target.value }))}
-                          />
-                        ) : (
-                          <span className="user-name">{user.name}</span>
-                        )}
+                        <span className="user-name">{user.name}</span>
                       </td>
                       <td>
-                        {isEditing ? (
-                          <input
-                            className="inline-edit"
-                            type="email"
-                            value={editing.email}
-                            onChange={(event) => setEditing((value) => ({ ...value, email: event.target.value }))}
-                          />
-                        ) : (
-                          <span className="user-email">{user.email}</span>
-                        )}
+                        <span className="user-email">{user.email}</span>
                       </td>
                       <td>
                         <select
@@ -256,26 +220,6 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
                       </td>
                       <td>
                         <div className="action-btns">
-                          {isEditing ? (
-                            <>
-                              <button className="act-btn save" onClick={saveEdit} title="Save" disabled={isSaving} type="button">
-                                <Save size={14} />
-                              </button>
-                              <button className="act-btn cancel" onClick={() => setEditing(null)} title="Cancel" type="button">
-                                <X size={14} />
-                              </button>
-                            </>
-                          ) : (
-                            <button
-                              className="act-btn edit"
-                              onClick={() => setEditing({ id: user._id, name: user.name, email: user.email })}
-                              title="Edit details"
-                              disabled={isSaving}
-                              type="button"
-                            >
-                              <Edit2 size={14} />
-                            </button>
-                          )}
                           <button
                             className={`act-btn ${user.isBlocked ? 'unblock' : 'block'}`}
                             onClick={() => handleBlock(user._id)}

@@ -1,5 +1,10 @@
 import { config } from '../config.js';
 
+function clearStoredSession() {
+  window.localStorage.removeItem('upay.authToken');
+  window.localStorage.removeItem('upay.activeUser');
+}
+
 export async function apiRequest(path, options = {}) {
   const base = String(config.apiBaseUrl || '').replace(/\/+$/, '');
   const url = String(path).startsWith('http') ? path : `${base}${String(path).startsWith('/') ? '' : '/'}${path}`;
@@ -17,6 +22,12 @@ export async function apiRequest(path, options = {}) {
     });
   } catch (err) {
     throw new Error(`Network request failed: ${err.message}`);
+  }
+
+  // If 401 Unauthorized, clear session
+  if (response.status === 401) {
+    clearStoredSession();
+    window.location.href = '/login';
   }
 
   const data = await response.json().catch(() => null);
