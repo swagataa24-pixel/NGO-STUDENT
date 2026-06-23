@@ -35,18 +35,35 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
   const [previewUrl, setPreviewUrl] = useState('');
 
   // Extract unique classes and activities for filter dropdowns
-  const uniqueClasses = useMemo(() => classes.map(c => ({ id: mongoId(c), name: c.name })), [classes]);
+  const teacherClasses = useMemo(() => {
+    if (isAdmin) return classes;
+    return classes.filter(classItem => {
+      const teacher = classItem.teacher?.toString().toLowerCase();
+      return teacher === activeUser.name?.toLowerCase() || teacher === activeUser.email?.toLowerCase();
+    });
+  }, [isAdmin, classes, activeUser]);
+
+  const uniqueClasses = useMemo(() => teacherClasses.map(c => ({ id: mongoId(c), name: c.name })), [teacherClasses]);
   const uniqueActivities = useMemo(() => {
     const activities = new Set(photos.map(p => p.activity || 'Activity proof').filter(Boolean));
     return Array.from(activities);
   }, [photos]);
 
+  // Get teacher class names/ids
+  const teacherClassNames = new Set(teacherClasses.map(c => c.name));
+  const teacherClassIds = new Set(teacherClasses.map(c => mongoId(c)));
+
   // Filtered photos based on filters and user role
   const filteredPhotos = useMemo(() => {
     return photos.filter(photo => {
-      // Role-based filtering: Teachers see only their own photos, Admins see all
-      if (!isAdmin && photo.uploadedBy && photo.uploadedBy !== teacherIdentifier) {
-        return false;
+      // Role-based filtering: Teachers see only their own photos or photos from their classes, Admins see all
+      if (!isAdmin) {
+        const uploadedByMatch = photo.uploadedBy === teacherIdentifier;
+        const classMatch = teacherClassNames.has(photo.className) || 
+                          teacherClassIds.has(String(photo.classId));
+        if (!uploadedByMatch && !classMatch) {
+          return false;
+        }
       }
 
       // Class filter: If selected class, check if className matches or is 'all'
@@ -77,7 +94,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
       }
       return true;
     });
-  }, [photos, filters, uniqueClasses, isAdmin, teacherIdentifier]);
+  }, [photos, filters, uniqueClasses, isAdmin, teacherIdentifier, teacherClassNames, teacherClassIds]);
 
   useEffect(() => {
     if (!draft.file) {
