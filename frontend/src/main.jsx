@@ -241,7 +241,7 @@ function App() {
               path={config.routes.attendance.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
-                  <AttendancePage students={students} setStudents={setStudents} classes={classes} setPhotos={setPhotos} />
+                  <AttendancePage activeUser={activeUser} students={students} setStudents={setStudents} classes={classes} setPhotos={setPhotos} />
                 </AccessRoute>
               }
             />
@@ -250,10 +250,10 @@ function App() {
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin']}>
                   <VolunteersPage
-                    volunteers={volunteers}
-                    setVolunteers={setVolunteers}
+                    activeUser={activeUser}
                     students={students}
                     classes={classes}
+                    attendanceSessions={attendanceSessions}
                     dataStatus={dataStatus}
                     refreshData={refreshData}
                   />
@@ -265,11 +265,8 @@ function App() {
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin']}>
                   <VolunteerDetailPage
-                    volunteers={volunteers}
-                    setVolunteers={setVolunteers}
-                    students={students}
-                    classes={classes}
                     attendanceSessions={attendanceSessions}
+                    photos={photos}
                     dataStatus={dataStatus}
                     refreshData={refreshData}
                   />
@@ -280,11 +277,18 @@ function App() {
               path={config.routes.reports.replace(/^\//, '')}
               element={
                 <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
-                  <ReportsPage students={students} photos={photos} volunteers={volunteers} classes={classes} />
+                  <ReportsPage activeUser={activeUser} students={students} photos={photos} volunteers={volunteers} classes={classes} />
                 </AccessRoute>
               }
             />
-            <Route path={config.routes.gallery.replace(/^\//, '')} element={<GalleryPage photos={photos} setPhotos={setPhotos} classes={classes} />} />
+            <Route
+              path={config.routes.gallery.replace(/^\//, '')}
+              element={
+                <AccessRoute activeUser={activeUser} allowedRoles={['Admin', 'Teacher']}>
+                  <GalleryPage activeUser={activeUser} photos={photos} setPhotos={setPhotos} classes={classes} />
+                </AccessRoute>
+              }
+            />
             <Route
               path={config.routes.admin.replace(/^\//, '')}
               element={

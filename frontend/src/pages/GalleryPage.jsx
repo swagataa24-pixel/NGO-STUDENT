@@ -11,7 +11,10 @@ function displayPhotoDate(photo) {
   return photo.date || (photo.activityDate ? photo.activityDate.slice(0, 10) : today());
 }
 
-export function GalleryPage({ photos, setPhotos, classes = [] }) {
+export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
+  const isAdmin = activeUser?.role === 'Admin';
+  const teacherIdentifier = activeUser?.name || activeUser?.email || 'unknown-teacher';
+  
   const fileInputRef = useRef(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -37,9 +40,14 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
     return Array.from(activities);
   }, [photos]);
 
-  // Filtered photos based on filters
+  // Filtered photos based on filters and user role
   const filteredPhotos = useMemo(() => {
     return photos.filter(photo => {
+      // Role-based filtering: Teachers see only their own photos, Admins see all
+      if (!isAdmin && photo.uploadedBy && photo.uploadedBy !== teacherIdentifier) {
+        return false;
+      }
+
       // Class filter: If selected class, check if className matches or is 'all'
       if (filters.className !== 'all') {
         const selectedClass = uniqueClasses.find(c => c.name === filters.className);
@@ -68,7 +76,7 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
       }
       return true;
     });
-  }, [photos, filters, uniqueClasses]);
+  }, [photos, filters, uniqueClasses, isAdmin, teacherIdentifier]);
 
   useEffect(() => {
     if (!draft.file) {
@@ -100,7 +108,8 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
       center: draft.center || 'Unassigned center',
       activity: draft.activity || 'Activity proof',
       activityDate: new Date(`${draft.date}T12:00:00`).toISOString(),
-      date: draft.date
+      date: draft.date,
+      uploadedBy: teacherIdentifier
     };
     setPhotos((items) => [newPhoto, ...items]);
     setDraft({ caption: '', center: '', activity: '', date: today(), file: null });

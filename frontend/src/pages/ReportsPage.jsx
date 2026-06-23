@@ -31,7 +31,10 @@ function photoActivity(photo) {
   return photo.activity || photo.caption || 'Class proof';
 }
 
-export function ReportsPage({ students, photos, volunteers = [], classes: classGroups = [] }) {
+export function ReportsPage({ activeUser, students, photos, volunteers = [], classes: classGroups = [] }) {
+  const isAdmin = activeUser?.role === 'Admin';
+  const teacherIdentifier = activeUser?.name || activeUser?.email || 'unknown-teacher';
+  
   const [reportType, setReportType] = useState('monthly'); // 'monthly' or 'yearly'
   const [month, setMonth] = useState('2026-06');
   const [year, setYear] = useState('2026');
@@ -44,12 +47,22 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
     ...new Set(classGroups.map((item) => item.name))
   ];
 
-  const filteredStudents = students.filter((student) => {
+  // Filter students based on role
+  const roleFilteredStudents = isAdmin 
+    ? students 
+    : students.filter((student) => student.className === className || className === 'all');
+
+  const filteredStudents = roleFilteredStudents.filter((student) => {
     const classMatch = className === 'all' || student.className === className;
     return classMatch;
   });
 
-  const filteredPhotos = photos.filter((photo) => {
+  // Filter photos based on role - Teachers see only their own photos
+  const roleFilteredPhotos = isAdmin 
+    ? photos 
+    : photos.filter((photo) => !photo.uploadedBy || photo.uploadedBy === teacherIdentifier);
+
+  const filteredPhotos = roleFilteredPhotos.filter((photo) => {
     const classMatch = className === 'all' || photo.className === className || String(photo.caption || '').includes(className);
     return classMatch;
   });

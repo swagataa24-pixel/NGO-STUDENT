@@ -27,7 +27,10 @@ const readFileAsDataUrl = (file) =>
     reader.readAsDataURL(file);
   });
 
-export function AttendancePage({ students, setStudents, classes: classGroups = [], setPhotos }) {
+export function AttendancePage({ activeUser, students, setStudents, classes: classGroups = [], setPhotos }) {
+  const isAdmin = activeUser?.role === 'Admin';
+  const teacherIdentifier = activeUser?.name || activeUser?.email || 'demo-teacher';
+  
   const activeClassGroups = useMemo(
     () => classGroups.filter((item) => item.activeStatus !== false && item.active !== false),
     [classGroups]
@@ -136,7 +139,7 @@ export function AttendancePage({ students, setStudents, classes: classGroups = [
       centerId: roster[0]?.centerId || config.defaultCenter,
       classId: selectedClassId,
       className: selectedClass,
-      teacherId: 'demo-teacher',
+      teacherId: teacherIdentifier,
       date: new Date(`${sessionDate}T12:00:00`).toISOString(),
       totalStudents: roster.length,
       presentCount: present,
