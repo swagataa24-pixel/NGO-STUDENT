@@ -184,12 +184,13 @@ function App() {
       setAttendanceSessions(attendanceData);
       setDataStatus({ loading: false, error: '' });
     } catch (error) {
+      console.error('refreshData failed:', error);
       setStudents([]);
       setClasses([]);
       setPhotos([]);
       setVolunteers([]);
       setAttendanceSessions([]);
-      setDataStatus({ loading: false, error: `${error.message} Start the API server and configure MongoDB.` });
+      setDataStatus({ loading: false, error: error.message });
     }
   };
 
