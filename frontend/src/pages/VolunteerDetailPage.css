@@ -1,3 +1,4 @@
+/* ============= Page Layout ============= */
 .volunteer-hero-actions {
   align-items: center;
   display: flex;
@@ -19,45 +20,97 @@
   color: var(--color-secondary);
 }
 
+/* ============= Volunteer Detail Grid ============= */
 .volunteer-detail-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 2rem;
 }
 
 .volunteer-panel-card,
 .volunteer-detail-card {
   background: var(--bg-secondary);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 1.2rem;
+  padding: 1.5rem;
+  transition: all 200ms ease;
 }
 
-.volunteer-summary-stats {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  display: grid;
+.volunteer-detail-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(45, 212, 191, 0.1);
+}
+
+/* ============= Card Headers ============= */
+.detail-card-heading {
+  align-items: center;
+  display: flex;
   gap: 0.8rem;
-  grid-template-columns: repeat(4, minmax(70px, 1fr));
-  margin-bottom: 1rem;
-  padding: 1rem 0;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.detail-card-heading svg {
+  color: var(--color-primary);
+  opacity: 0.8;
+}
+
+.detail-card-heading h4 {
+  font-family: var(--font-serif), serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.detail-card-heading span {
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.15), rgba(34, 197, 94, 0.15));
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============= Summary Stats ============= */
+.volunteer-summary-stats {
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(4, minmax(80px, 1fr));
+  margin-bottom: 1.5rem;
+  padding: 1.2rem 0;
 }
 
 .volunteer-summary-stats strong {
   display: block;
   font-family: var(--font-serif), serif;
-  font-size: 1.4rem;
-  font-weight: 400;
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
 }
 
 .volunteer-summary-stats span {
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
+/* ============= Contact Grid ============= */
 .volunteer-contact-grid {
   display: grid;
   gap: 0.8rem;
@@ -72,69 +125,138 @@
   text-transform: uppercase;
 }
 
-.detail-card-heading {
-  align-items: center;
-  display: flex;
-  gap: 0.6rem;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-}
-
-.detail-card-heading h4 {
-  font-family: var(--font-serif), serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-  margin: 0.2rem 0 0;
-}
-
-.detail-card-heading span {
-  background: var(--bg-tint);
-  border-radius: 999px;
-  color: var(--color-primary);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.55rem;
-}
-
+/* ============= Tables ============= */
 .detail-table-wrap {
+  border-radius: var(--radius-lg);
+  margin-top: 1rem;
   overflow-x: auto;
 }
 
 .detail-table {
   border-collapse: collapse;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   width: 100%;
 }
 
-.detail-table th,
-.detail-table td {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 0.65rem 0.4rem;
-  text-align: left;
-}
-
 .detail-table th {
-  color: var(--text-muted);
-  font-size: 0.72rem;
+  background: rgba(45, 212, 191, 0.05);
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--text-primary);
+  font-size: 0.75rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.85rem;
+  text-align: left;
   text-transform: uppercase;
 }
 
+.detail-table td {
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 0.85rem;
+  text-align: left;
+}
+
+.detail-table tbody tr:hover {
+  background: rgba(45, 212, 191, 0.03);
+}
+
+.detail-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-center {
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* ============= Photos Grid ============= */
+.photos-grid {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  margin-top: 1rem;
+}
+
+.photo-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 200ms ease;
+  background: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.2);
+  transform: translateY(-2px);
+}
+
+.photo-card img {
+  display: block;
+  height: 150px;
+  object-fit: cover;
+  width: 100%;
+  transition: transform 200ms ease;
+}
+
+.photo-card:hover img {
+  transform: scale(1.05);
+}
+
+.photo-details {
+  padding: 0.8rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-caption {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0 0 0.3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-date {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ============= Empty States ============= */
 .detail-empty {
   color: var(--text-secondary);
-  font-size: 0.88rem;
-  line-height: 1.55;
+  font-size: 0.95rem;
+  line-height: 1.6;
   margin: 0;
+  padding: 1rem;
 }
 
 .detail-empty a {
   color: var(--color-primary);
   font-weight: 600;
+  text-decoration: none;
 }
 
+.detail-empty a:hover {
+  text-decoration: underline;
+}
+
+/* ============= Buttons ============= */
 .danger-button {
   border-color: rgba(200, 30, 30, 0.2);
   color: var(--risk-fg);
+  transition: all 200ms ease;
 }
 
 .danger-button:hover {
@@ -142,34 +264,82 @@
   border-color: var(--risk-fg);
 }
 
+/* ============= Dark Theme Overrides ============= */
+:root[data-theme='dark'] .volunteer-detail-card,
+:root[data-theme='dark'] .volunteer-panel-card {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(45, 212, 191, 0.15);
+}
+
+:root[data-theme='dark'] .detail-table th {
+  background: rgba(45, 212, 191, 0.08);
+  border-color: rgba(45, 212, 191, 0.4);
+}
+
+:root[data-theme='dark'] .detail-table tbody tr:hover {
+  background: rgba(45, 212, 191, 0.05);
+}
+
+:root[data-theme='dark'] .photo-card {
+  border-color: rgba(45, 212, 191, 0.2);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+/* ============= Responsive Design ============= */
 @media (max-width: 1040px) {
   .volunteer-detail-grid,
   .volunteer-contact-grid,
   .volunteer-summary-stats {
     grid-template-columns: 1fr;
   }
+
+  .detail-table {
+    font-size: 0.8rem;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 0.6rem;
+  }
+
+  .photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
 }
 
-/* Dark theme overrides for VolunteerDetailPage */
-.theme-admin-dark .volunteer-panel-card,
-.theme-admin-dark .volunteer-detail-card {
-  background: var(--bg-secondary);
-  border-color: rgba(45, 212, 191, 0.2);
-}
+@media (max-width: 640px) {
+  .volunteer-detail-grid,
+  .volunteer-contact-grid,
+  .volunteer-summary-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 
-.theme-admin-dark .volunteer-summary-stats {
-  border-color: rgba(45, 212, 191, 0.2);
-}
+  .volunteer-summary-stats {
+    padding: 1rem 0;
+  }
 
-.theme-admin-dark .detail-table-wrap {
-  border-radius: var(--radius-lg);
-}
+  .detail-card-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 
-.theme-admin-dark .detail-table th,
-.theme-admin-dark .detail-table td {
-  border-color: rgba(255, 255, 255, 0.05);
-}
+  .detail-table {
+    font-size: 0.75rem;
+  }
 
-.theme-admin-dark .link-button:hover {
-  color: var(--color-accent);
+  .detail-table th,
+  .detail-table td {
+    padding: 0.5rem 0.3rem;
+  }
+
+  .photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .photo-card img {
+    height: 120px;
+  }
 }
