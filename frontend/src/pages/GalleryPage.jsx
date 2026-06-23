@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Plus, X, Upload, Search, Calendar, Filter, Info } from 'lucide-react';
+import { Plus, X, Upload, Search, Calendar, Filter, Info, Image as ImageIcon, Sparkles } from 'lucide-react';
 import './GalleryPage.css';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { config } from '../config.js';
@@ -108,12 +108,23 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
   };
 
   return (
-    <section className="section">
-      <div className="container page-hero gallery-hero">
+    <section className="section gallery-page">
+      <div className="gallery-bg" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <div className="container gallery-hero">
         <div>
           <span className="eyebrow">Media Archive</span>
-          <h2>Curated Visual Records of On-Ground Impact</h2>
-          <p>Document, organize, and explore photo documentation of every transformative moment from your programs.</p>
+          <h2>Visual proof, beautifully archived.</h2>
+          <p>Explore verified moments from classes, outreach, and field activity without digging through a clunky folder dump.</p>
+          <div className="gallery-hero-stats" aria-label="Gallery summary">
+            <span><strong>{photos.length}</strong> proofs</span>
+            <span><strong>{uniqueActivities.length}</strong> activities</span>
+            <span><strong>{filteredPhotos.length}</strong> visible</span>
+          </div>
         </div>
         <div className="hero-actions">
           <button
@@ -222,12 +233,12 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
         </div>
       )}
 
-      <div className="container filters-section">
+      <div className="container gallery-toolbar">
+        <div className="filter-icon">
+          <Filter size={18} />
+          <span>Refine archive</span>
+        </div>
         <div className="filters-header">
-          <div className="filter-icon">
-            <Filter size={20} />
-            <span>Refine your view</span>
-          </div>
           <div className="filters-grid">
             <label className="filter-label">
               <span>
@@ -293,32 +304,52 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
       </div>
 
       <div className="container gallery-grid-container">
+        <div className="gallery-grid-heading">
+          <div>
+            <span className="eyebrow">Field moments</span>
+            <h3>{filteredPhotos.length ? 'Latest visual records' : 'No matching records'}</h3>
+          </div>
+          <span className="gallery-count-pill">
+            <ImageIcon size={16} /> {filteredPhotos.length} shown
+          </span>
+        </div>
         <div className="gallery-grid">
           {filteredPhotos.length ? filteredPhotos.map((photo) => (
-            <figure className="photo-card" key={photo.id || photo._id}>
+            <figure
+              className="photo-card"
+              key={photo.id || photo._id}
+              onClick={() => setSelectedPhoto(photo)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedPhoto(photo);
+                }
+              }}
+            >
               <div className="photo-overlay">
                 <img src={photo.imageUrl} alt={photo.caption} />
+                <span className="photo-date-chip">{displayPhotoDate(photo)}</span>
                 <div className="photo-actions">
                   <button
                     className="info-button"
-                    onClick={() => setSelectedPhoto(photo)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedPhoto(photo);
+                    }}
+                    type="button"
                   >
-                    <Info size={18} />
+                    <Info size={16} />
+                    View details
                   </button>
                 </div>
               </div>
               <figcaption className="photo-details">
                 <strong className="photo-caption">{photo.caption}</strong>
                 <div className="photo-meta">
-                  <span className="meta-item">
-                    <span className="meta-label">Activity:</span> {photo.activity}
-                  </span>
-                  <span className="meta-item">
-                    <span className="meta-label">Center:</span> {photo.center || photo.centerId}
-                  </span>
-                  <span className="meta-item">
-                    <span className="meta-label">Date:</span> {displayPhotoDate(photo)}
-                  </span>
+                  <span className="meta-item"><Sparkles size={13} /> {photo.activity || 'Activity proof'}</span>
+                  <span className="meta-item">{photo.center || photo.centerId || 'Unassigned center'}</span>
                 </div>
               </figcaption>
             </figure>
