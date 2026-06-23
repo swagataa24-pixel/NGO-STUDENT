@@ -64,7 +64,7 @@ export function VolunteerDetailPage({ attendanceSessions = [], photos = [], data
   }
 
   return (
-    <section className="section theme-admin-dark">
+    <section className="section">
       <div className="container page-hero with-action">
         <div>
           <Link to={config.routes.volunteers} className="eyebrow link-button">
