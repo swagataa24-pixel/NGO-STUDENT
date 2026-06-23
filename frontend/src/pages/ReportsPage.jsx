@@ -42,15 +42,30 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
   const [previewPhoto, setPreviewPhoto] = useState(null);
   const navigate = useNavigate();
 
+  // First get teacher's own classes
+  const teacherClasses = useMemo(() => {
+    if (isAdmin) return classGroups;
+    return classGroups.filter(classItem => {
+      const teacher = classItem.teacher?.toString().toLowerCase();
+      return teacher === activeUser.name?.toLowerCase() || teacher === activeUser.email?.toLowerCase();
+    });
+  }, [isAdmin, classGroups, activeUser]);
+
+  const teacherClassNames = new Set(teacherClasses.map(c => c.name));
+  const teacherClassIds = new Set(teacherClasses.map(c => mongoId(c)));
+
   const classOptions = [
     'all',
-    ...new Set(classGroups.map((item) => item.name))
+    ...new Set(teacherClasses.map((item) => item.name))
   ];
 
   // Filter students based on role
   const roleFilteredStudents = isAdmin 
     ? students 
-    : students.filter((student) => student.className === className || className === 'all');
+    : students.filter((student) => {
+        return teacherClassNames.has(student.className) || 
+               teacherClassIds.has(String(student.classId));
+      });
 
   const filteredStudents = roleFilteredStudents.filter((student) => {
     const classMatch = className === 'all' || student.className === className;
@@ -60,10 +75,15 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
   // Filter photos based on role - Teachers see only their own photos
   const roleFilteredPhotos = isAdmin 
     ? photos 
-    : photos.filter((photo) => !photo.uploadedBy || photo.uploadedBy === teacherIdentifier);
+    : photos.filter((photo) => {
+        const uploadedByMatch = photo.uploadedBy === teacherIdentifier;
+        const classMatch = teacherClassNames.has(photo.className) || 
+                          teacherClassIds.has(String(photo.classId));
+        return uploadedByMatch || classMatch;
+      });
 
   const filteredPhotos = roleFilteredPhotos.filter((photo) => {
-    const classMatch = className === 'all' || photo.className === className || String(photo.caption || '').includes(className);
+    const classMatch = className === 'all' || photo.className === className;
     return classMatch;
   });
 
