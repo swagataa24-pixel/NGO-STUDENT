@@ -1,9 +1,21 @@
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
+import { Report } from '../models/Report.js';
 import { buildCloudinaryStubUpload, describeCloudinaryStatus, isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
 import mongoose from 'mongoose';
 
-export async function listPhotos(filters = {}) {
+export async function listPhotos(filters = {}, user = null) {
   const query = filters.centerId ? { centerId: filters.centerId } : {};
+  
+  // Teachers can only see their own photos; Admins see all
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.$or = [
+      { uploadedBy: teacherIdentifier },
+      { uploadedBy: null },
+      { uploadedBy: '' }
+    ];
+  }
+  
   return ActivityPhoto.find(query).sort({ activityDate: -1 });
 }
 
@@ -43,8 +55,18 @@ export async function createPhoto(payload) {
   };
 }
 
-export function cloudinaryReady() {
-  return isCloudinaryConfigured();
+export async function deletePhoto(id) {
+  const photo = await ActivityPhoto.findById(id);
+  if (!photo) return null;
+  
+  // Clean up any report references to this photo
+  await Report.updateMany(
+    { photoRefs: id },
+    { $pull: { photoRefs: id } }
+  );
+  
+  // Delete the photo
+  const deleted = await ActivityPhoto.findByIdAndDelete(id);
+  return deleted;
 }
-
 

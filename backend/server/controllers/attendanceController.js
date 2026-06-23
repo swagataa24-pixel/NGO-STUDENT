@@ -4,7 +4,7 @@ import { asNonEmptyString } from '../utils/validators.js';
 
 export async function index(req, res, next) {
   try {
-    res.json(await attendanceService.listAttendance(req.query));
+    res.json(await attendanceService.listAttendance(req.query, req.user));
   } catch (error) {
     next(error);
   }

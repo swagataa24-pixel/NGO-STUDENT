@@ -8,7 +8,8 @@ export async function monthly(req, res, next) {
       await reportService.generateMonthlyReport({
         month,
         year,
-        centerId: req.query.centerId
+        centerId: req.query.centerId,
+        user: req.user
       })
     );
   } catch (error) {
@@ -18,7 +19,7 @@ export async function monthly(req, res, next) {
 
 export async function exportMonthly(req, res, next) {
   try {
-    const report = await reportService.saveMonthlyReport(req.body);
+    const report = await reportService.saveMonthlyReport({ ...req.body, user: req.user });
     res.status(201).json({ message: 'Report metadata saved. PDF export can be attached here.', report });
   } catch (error) {
     next(error);

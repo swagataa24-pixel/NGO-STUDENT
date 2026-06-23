@@ -5,16 +5,19 @@ import { Student } from '../models/Student.js';
 import { Volunteer } from '../models/Volunteer.js';
 import { parseMonthYear } from '../utils/validators.js';
 
-export async function generateMonthlyReport({ month, year, centerId }) {
+export async function generateMonthlyReport({ month, year, centerId, user = null }) {
   const normalized = parseMonthYear({ month, year });
   const start = new Date(normalized.year, normalized.month - 1, 1);
   const end = new Date(normalized.year, normalized.month, 1);
   const scoped = centerId ? { centerId } : {};
 
+  // Teachers can only view their own reports
+  const teacherFilter = user && user.role === 'Teacher' ? { teacherId: user.name || user.email } : {};
+
   const [students, sessions, photos, volunteers] = await Promise.all([
     Student.find(scoped),
-    AttendanceSession.find({ ...scoped, date: { $gte: start, $lt: end } }),
-    ActivityPhoto.find({ ...scoped, activityDate: { $gte: start, $lt: end } }),
+    AttendanceSession.find({ ...scoped, ...teacherFilter, date: { $gte: start, $lt: end } }),
+    ActivityPhoto.find({ ...scoped, ...teacherFilter, activityDate: { $gte: start, $lt: end } }),
     Volunteer.find(centerId ? { assignedCenter: centerId } : {})
   ]);
 
@@ -40,4 +43,14 @@ export async function generateMonthlyReport({ month, year, centerId }) {
 export async function saveMonthlyReport(filters) {
   const report = await generateMonthlyReport(filters);
   return Report.create(report);
+}
+
+// Clean up orphaned photoRefs when photos are deleted
+export async function cleanupPhotoRefs(photoIds = []) {
+  if (photoIds.length === 0) return;
+  const result = await Report.updateMany(
+    { photoRefs: { $in: photoIds } },
+    { $pull: { photoRefs: { $in: photoIds } } }
+  );
+  return result.modifiedCount;
 }

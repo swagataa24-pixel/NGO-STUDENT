@@ -2,11 +2,18 @@ import { AttendanceSession } from '../models/AttendanceSession.js';
 import { Student } from '../models/Student.js';
 import mongoose from 'mongoose';
 
-export async function listAttendance(filters = {}) {
+export async function listAttendance(filters = {}, user = null) {
   const query = {};
   if (filters.centerId) query.centerId = filters.centerId;
   if (filters.classId && mongoose.isValidObjectId(filters.classId)) query.classId = filters.classId;
   if (filters.className) query.className = filters.className;
+  
+  // Teachers can only see their own attendance sessions; Admins see all
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.teacherId = teacherIdentifier;
+  }
+  
   return AttendanceSession.find(query).sort({ date: -1 });
 }
 

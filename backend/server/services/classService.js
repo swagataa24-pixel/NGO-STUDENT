@@ -2,6 +2,7 @@ import { ClassGroup } from '../models/ClassGroup.js';
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
 import { AttendanceSession } from '../models/AttendanceSession.js';
 import { Student } from '../models/Student.js';
+import { Report } from '../models/Report.js';
 
 export async function listClasses(filters = {}) {
   const query = {};
@@ -40,11 +41,27 @@ export async function deleteClass(id) {
     ]
   };
 
-  const [studentResult, attendanceResult, photoResult] = await Promise.all([
+  // Get photos to delete (for cleanup operations)
+  const photosToDelete = await ActivityPhoto.find(relatedClassQuery).select('_id');
+  const photoIds = photosToDelete.map(p => p._id);
+
+  // Delete everything in parallel
+  const [studentResult, attendanceResult, photoResult, reportResult] = await Promise.all([
     Student.deleteMany(relatedClassQuery),
     AttendanceSession.deleteMany(relatedClassQuery),
-    ActivityPhoto.deleteMany(relatedClassQuery)
+    ActivityPhoto.deleteMany(relatedClassQuery),
+    // Delete reports related to this class
+    Report.deleteMany({ 'attendanceSummary.className': classGroup.name })
   ]);
+
+  // Clean up orphaned report photoRefs (in case any reports reference deleted photos)
+  if (photoIds.length > 0) {
+    await Report.updateMany(
+      { photoRefs: { $in: photoIds } },
+      { $pull: { photoRefs: { $in: photoIds } } }
+    );
+  }
+
   await ClassGroup.findByIdAndDelete(id);
 
   return {
@@ -52,7 +69,8 @@ export async function deleteClass(id) {
     deleted: {
       students: studentResult.deletedCount || 0,
       attendanceSessions: attendanceResult.deletedCount || 0,
-      photos: photoResult.deletedCount || 0
+      photos: photoResult.deletedCount || 0,
+      reports: reportResult.deletedCount || 0
     }
   };
 }
