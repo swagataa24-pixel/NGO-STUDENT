@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Camera, ClipboardList } from 'lucide-react';
+import { ArrowUpRight, BarChart3, BookOpen, Camera, ClipboardList } from 'lucide-react';
 import './ProgramsPage.css';
 
 export function ProgramsPage() {
@@ -10,20 +10,37 @@ export function ProgramsPage() {
   ];
 
   return (
-    <section className="section tinted">
-      <div className="container page-hero">
-        <span className="eyebrow">Initiatives</span>
-        <h2>Bridging community advocacy and structural operations.</h2>
-        <p>Our core initiatives are structured to turn daily education and volunteer activities into transparent, auditable progress records.</p>
-      </div>
-      <div className="container card-grid four">
-        {programs.map(([Icon, title, text]) => (
-          <article className="soft-card" key={title}>
-            <Icon className="card-icon" />
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </article>
-        ))}
+    <section className="section tinted programs-section">
+      <div className="container programs-showcase">
+        <div className="programs-copy">
+          <span className="eyebrow">Initiatives</span>
+          <h2>Where teaching, proof, and progress move together.</h2>
+          <p>
+            UPAY's core programs connect daily classroom support with clean records,
+            verified activity proof, and monthly operational clarity.
+          </p>
+          <div className="programs-orbit" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+
+        <div className="programs-flow" aria-label="Program initiatives">
+          {programs.map(([Icon, title, text], index) => (
+            <article className="program-flow-item" key={title} style={{ '--item-index': index }}>
+              <div className="program-flow-icon">
+                <Icon size={22} />
+              </div>
+              <div>
+                <span>0{index + 1}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+              <ArrowUpRight className="program-flow-arrow" size={18} />
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
