@@ -1,4 +1,5 @@
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
+import { ClassGroup } from '../models/ClassGroup.js';
 import { Report } from '../models/Report.js';
 import { buildCloudinaryStubUpload, describeCloudinaryStatus, isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
 import mongoose from 'mongoose';
@@ -6,14 +7,27 @@ import mongoose from 'mongoose';
 export async function listPhotos(filters = {}, user = null) {
   const query = filters.centerId ? { centerId: filters.centerId } : {};
   
-  // Teachers can only see their own photos; Admins see all
+  // Teachers can only see photos from their own classes OR photos they uploaded
   if (user && user.role === 'Teacher') {
     const teacherIdentifier = user.name || user.email;
-    query.$or = [
-      { uploadedBy: teacherIdentifier },
-      { uploadedBy: null },
-      { uploadedBy: '' }
+    const teacherClasses = await ClassGroup.find({ teacher: teacherIdentifier }).select('_id name');
+    const classIds = teacherClasses.map(c => c._id);
+    const classNames = teacherClasses.map(c => c.name);
+    
+    query.$and = [
+      {
+        $or: [
+          { uploadedBy: teacherIdentifier },
+          { classId: { $in: classIds } },
+          { className: { $in: classNames } }
+        ]
+      }
     ];
+    
+    // If teacher has no classes and no uploaded photos, return empty
+    if (classIds.length === 0 && classNames.length === 0) {
+      query.uploadedBy = teacherIdentifier; // will only match if they uploaded something, else empty
+    }
   }
   
   return ActivityPhoto.find(query).sort({ activityDate: -1 });

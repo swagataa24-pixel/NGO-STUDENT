@@ -1,5 +1,6 @@
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
 import { AttendanceSession } from '../models/AttendanceSession.js';
+import { ClassGroup } from '../models/ClassGroup.js';
 import { Report } from '../models/Report.js';
 import { Student } from '../models/Student.js';
 import { Volunteer } from '../models/Volunteer.js';
@@ -11,14 +12,50 @@ export async function generateMonthlyReport({ month, year, centerId, user = null
   const end = new Date(normalized.year, normalized.month, 1);
   const scoped = centerId ? { centerId } : {};
 
-  // Teachers can only view their own reports
-  const teacherFilter = user && user.role === 'Teacher' ? { teacherId: user.name || user.email } : {};
+  // Get teacher's classes if needed
+  let teacherClassIds = [];
+  let teacherClassNames = [];
+  let teacherIdentifier = null;
+  
+  if (user && user.role === 'Teacher') {
+    teacherIdentifier = user.name || user.email;
+    const teacherClasses = await ClassGroup.find({ teacher: teacherIdentifier }).select('_id name');
+    teacherClassIds = teacherClasses.map(c => c._id);
+    teacherClassNames = teacherClasses.map(c => c.name);
+  }
+
+  // Build queries based on user role
+  let studentQuery = { ...scoped };
+  let sessionQuery = { ...scoped, date: { $gte: start, $lt: end } };
+  let photoQuery = { ...scoped, activityDate: { $gte: start, $lt: end } };
+
+  if (user && user.role === 'Teacher') {
+    // Filter students to only those in teacher's classes
+    studentQuery.$or = [
+      { classId: { $in: teacherClassIds } },
+      { className: { $in: teacherClassNames } }
+    ];
+
+    // Filter sessions to teacher's classes (or teacherId)
+    sessionQuery.$or = [
+      { teacherId: teacherIdentifier },
+      { classId: { $in: teacherClassIds } },
+      { className: { $in: teacherClassNames } }
+    ];
+
+    // Filter photos to teacher's classes or uploaded by teacher
+    photoQuery.$or = [
+      { uploadedBy: teacherIdentifier },
+      { classId: { $in: teacherClassIds } },
+      { className: { $in: teacherClassNames } }
+    ];
+  }
 
   const [students, sessions, photos, volunteers] = await Promise.all([
-    Student.find(scoped),
-    AttendanceSession.find({ ...scoped, ...teacherFilter, date: { $gte: start, $lt: end } }),
-    ActivityPhoto.find({ ...scoped, ...teacherFilter, activityDate: { $gte: start, $lt: end } }),
-    Volunteer.find(centerId ? { assignedCenter: centerId } : {})
+    Student.find(studentQuery),
+    AttendanceSession.find(sessionQuery),
+    ActivityPhoto.find(photoQuery),
+    (user && user.role === 'Admin') ? Volunteer.find(centerId ? { assignedCenter: centerId } : {}) : [] // Only admins see volunteers
   ]);
 
   const presentCount = sessions.reduce((sum, session) => sum + session.presentCount, 0);

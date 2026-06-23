@@ -101,10 +101,19 @@ Change `config.apiRoutes.attendanceSession` to match backend route
    - **User Data**: Emails are encrypted at rest (AES-256-GCM) with blind index for lookups; user roles enforced by `ADMIN_EMAILS` env var
    - **ClassGroup**: Teachers can only view/edit/delete their own classes
    - **Student**: Teachers can only view/edit/delete students in their own classes
-   - **ActivityPhoto**: Teachers can only view/upload/delete their own photos, and only to their own classes
-   - **AttendanceSession**: Already had filtering for teachers (verified consistency)
+   - **ActivityPhoto**: 
+     - Fixed to NOT show photos with `uploadedBy: null/empty` to teachers
+     - Now only shows teachers photos they uploaded OR photos linked to their classes
+   - **AttendanceSession**: 
+     - Now filters sessions to teacher's classes (not just teacherId)
+     - Teachers can only create sessions for their own classes
+     - Teachers can only record attendance for their own sessions
+     - createSession now automatically sets teacherId
    - **Progress Notes**: Teachers can only view/add notes to their own students; notes now track author
-   - **Reports**: Teachers can only view reports for their own classes/students
+   - **Reports**:
+     - Now properly filters students to only teacher's own classes
+     - Filters photos using same class-based logic
+     - Only admins see volunteer data in reports
    - **Volunteers**: Only admins can view, update, and delete volunteers
 
 3. **Frontend Fixes**:

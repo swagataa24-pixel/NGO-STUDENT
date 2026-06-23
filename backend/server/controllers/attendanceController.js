@@ -14,7 +14,7 @@ export async function createSession(req, res, next) {
   try {
     asNonEmptyString(req.body.className, 'Class name is required.');
     asNonEmptyString(req.body.centerId, 'Center ID is required.');
-    res.status(201).json(await attendanceService.createSession(req.body));
+    res.status(201).json(await attendanceService.createSession(req.body, req.user));
   } catch (error) {
     next(error);
   }
@@ -24,7 +24,7 @@ export async function record(req, res, next) {
   try {
     if (!['present', 'absent', 'skipped'].includes(req.body.status)) throw httpError(400, 'Attendance status is invalid.');
     asNonEmptyString(req.body.studentId, 'studentId is required.');
-    const session = await attendanceService.recordAttendance(req.params.id, req.body);
+    const session = await attendanceService.recordAttendance(req.params.id, req.body, req.user);
     if (!session) throw httpError(404, 'Attendance session not found.');
     res.json(session);
   } catch (error) {
