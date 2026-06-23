@@ -260,18 +260,17 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
   };
 
   return (
-    <section className="section">
-      <div className="container page-hero with-action">
-          <div>
+    <section className="section students-page">
+      <header className="container students-hero">
             {selectedClass ? (
-              <div className="back-button-container">
+              <>
                 <button className="back-button" onClick={() => navigate(config.routes.students)}>
                   <ArrowLeft size={18} /> Back to Classes
                 </button>
                 <span className="eyebrow">Class Detail</span>
                 <h2>{selectedClass.name}</h2>
                 <p>{selectedClass.description}</p>
-              </div>
+              </>
             ) : (
               <>
                 <span className="eyebrow">Class Management</span>
@@ -279,8 +278,7 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                 <p>Create classes, then click on a class to add and manage students.</p>
               </>
             )}
-          </div>
-        </div>
+      </header>
       {(dataStatus?.loading || dataStatus?.error || saveState) && (
         <div className="container data-status-row">
           {(dataStatus?.loading || dataStatus?.error) && (
@@ -295,8 +293,7 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
       <div className="container">
         {!selectedClass ? (
           <div className="classes-view">
-            <div className="class-form-section">
-              <form className="soft-card form-card" onSubmit={saveClass}>
+              <form className="class-form-section form-card" onSubmit={saveClass}>
                 <h3>{editingClassId ? 'Edit Class' : 'Create New Class'}</h3>
                 <label>
                   <span>Class Name</span>
@@ -341,7 +338,6 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                   </button>
                 )}
               </form>
-            </div>
             <div className="classes-grid">
               {sortedClasses.length === 0 ? (
                 <EmptyState title="No Classes Yet" text="Create your first class to get started!" />
