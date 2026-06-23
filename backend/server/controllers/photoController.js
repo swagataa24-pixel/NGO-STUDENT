@@ -1,5 +1,6 @@
 import { httpError } from '../utils/httpError.js';
-import { cloudinaryReady, createPhoto, listPhotos, deletePhoto } from '../services/photoService.js';
+import { createPhoto, listPhotos, deletePhoto } from '../services/photoService.js';
+import { isCloudinaryConfigured } from '../services/cloudinaryService.js';
 
 export async function index(req, res, next) {
   try {
@@ -15,7 +16,7 @@ export async function upload(req, res, next) {
     const photoData = { ...req.body, uploadedBy: req.body.uploadedBy || req.user.name || req.user.email };
     const created = await createPhoto(photoData);
     res.status(201).json({
-      message: cloudinaryReady() ? 'Photo uploaded and stored.' : 'Cloudinary is not configured. Saved as a local stub record.',
+      message: isCloudinaryConfigured() ? 'Photo uploaded and stored.' : 'Cloudinary is not configured. Saved as a local stub record.',
       photo: created
     });
   } catch (error) {

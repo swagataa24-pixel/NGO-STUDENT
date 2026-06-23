@@ -10,6 +10,8 @@
   --text-secondary: #5A5A57; /* Slate Grey */
   --text-muted: #8C8C88;     /* Warm Grey */
   
+  --border-subtle: rgba(0, 0, 0, 0.05); /* Subtle border */
+  
   /* Spruce green / Gold brand colors */
   --color-primary: #123C34;  /* Forest Spruce */
   --color-primary-hover: #1D5449;
@@ -51,6 +53,8 @@
   --text-primary: #E2E2E8;
   --text-secondary: #A6A6B4;
   --text-muted: #707080;
+  
+  --border-subtle: rgba(45, 212, 191, 0.2);
   
   --color-primary: #2DD4BF;
   --color-primary-hover: #34D399;

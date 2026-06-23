@@ -77,7 +77,7 @@ export function VolunteerDetailPage({ attendanceSessions = [], photos = [], data
 
       <div className="container">
         {/* Attendance Sessions */}
-        <section className="soft-card volunteer-detail-card">
+        <section className="volunteer-detail-card">
           <div className="detail-card-heading">
             <Calendar size={18} />
             <h4>Attendance Sessions</h4>
@@ -114,7 +114,7 @@ export function VolunteerDetailPage({ attendanceSessions = [], photos = [], data
         </section>
 
         {/* Uploaded Photos */}
-        <section className="soft-card volunteer-detail-card">
+        <section className="volunteer-detail-card">
           <div className="detail-card-heading">
             <ImageIcon size={18} />
             <h4>Uploaded Photos</h4>
