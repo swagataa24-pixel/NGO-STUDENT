@@ -45,6 +45,8 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
   const [saveState, setSaveState] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [showEditCamera, setShowEditCamera] = useState(false);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const videoRef = useRef(null);
   const editVideoRef = useRef(null);
   const streamRef = useRef(null);

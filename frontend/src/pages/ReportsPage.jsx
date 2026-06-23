@@ -177,7 +177,7 @@ export function ReportsPage({ students, photos, volunteers = [], classes: classG
                   student.attendanceStats?.attended ?? student.attended ?? 0,
                   student.attendanceStats?.conducted ?? student.conducted ?? 0,
                   `${value}%`,
-                  value > 50 ? 'Good' : value >= 40 ? 'Watch' : 'Intervention'
+                  value > 60 ? 'Good' : value >= 50 ? 'Watch' : 'Intervention'
                 ];
               })}
             />

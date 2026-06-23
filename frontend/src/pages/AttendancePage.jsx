@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Camera, Check, ChevronLeft, ChevronRight, RotateCcw, Save } from 'lucide-react';
+import { Camera, Check, ArrowLeft, ArrowRight, RotateCcw, Save } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { Metric } from '../components/Metric.jsx';
 import { ResponsiveTable } from '../components/ResponsiveTable.jsx';
@@ -366,12 +366,12 @@ function AttendanceDeck({ student, mark, disabled }) {
   return (
     <div className="swipe-stage">
       <div className={`swipe-zone left ${dragX < -25 ? 'active' : ''}`}>
-        <ChevronLeft size={34} />
+        <ArrowLeft size={36} />
         <span>Absent</span>
       </div>
       <div className={`swipe-zone right ${dragX > 25 ? 'active' : ''}`}>
         <span>Present</span>
-        <ChevronRight size={34} />
+        <ArrowRight size={36} />
       </div>
       <article
         className={`swipe-card ${dragging ? 'dragging' : ''} ${exitStatus ? `exiting ${exitStatus}` : ''}`}
@@ -411,10 +411,10 @@ function AttendanceDeck({ student, mark, disabled }) {
           </dl>
           <div className="button-row split">
             <button className="danger-button" onClick={() => commitStatus('absent')} disabled={disabled}>
-              <ChevronLeft size={18} /> Absent
+              <ArrowLeft size={18} /> Absent
             </button>
             <button className="primary-button" onClick={() => commitStatus('present')} disabled={disabled}>
-              Present <ChevronRight size={18} />
+              Present <ArrowRight size={18} />
             </button>
           </div>
         </div>

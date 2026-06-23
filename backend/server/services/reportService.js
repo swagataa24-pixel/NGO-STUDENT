@@ -22,7 +22,7 @@ export async function generateMonthlyReport({ month, year, centerId }) {
   const absentCount = sessions.reduce((sum, session) => sum + session.absentCount, 0);
   const lowAttendance = students.filter((student) => {
     const stats = student.attendanceStats || {};
-    return stats.conducted > 0 && Math.round((stats.attended / stats.conducted) * 100) < 40;
+    return stats.conducted > 0 && Math.round((stats.attended / stats.conducted) * 100) < 50;
   });
 
   return {

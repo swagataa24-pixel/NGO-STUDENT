@@ -5,7 +5,7 @@ export function percent(student) {
 }
 
 export function statusFor(value) {
-  if (value > 50) return 'good';
-  if (value >= 40) return 'watch';
+  if (value > 60) return 'good';
+  if (value >= 50) return 'watch';
   return 'risk';
 }

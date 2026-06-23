@@ -192,7 +192,7 @@ export function buildReportSummary(students, photos, volunteers = []) {
   const totalConducted = students.reduce((sum, student) => sum + safeNumber(student.conducted), 0);
   const totalAbsent = Math.max(totalConducted - totalPresent, 0);
   const averageAttendance = Math.round((totalPresent / Math.max(totalConducted, 1)) * 100);
-  const interventionStudents = students.filter((student) => percent(student) < 40);
+  const interventionStudents = students.filter((student) => percent(student) < 50);
 
   return {
     totalClasses,
@@ -227,10 +227,10 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
         const value = percent(student);
         let statusBadge = 'Intervention';
         let statusStyles = { textColor: [197, 34, 31], fillColor: [252, 232, 230], fontStyle: 'bold', halign: 'center' };
-        if (value > 50) {
+        if (value > 60) {
           statusBadge = 'Good';
           statusStyles = { textColor: [19, 115, 51], fillColor: [230, 244, 234], fontStyle: 'bold', halign: 'center' };
-        } else if (value >= 40) {
+        } else if (value >= 50) {
           statusBadge = 'Watch';
           statusStyles = { textColor: [176, 96, 0], fillColor: [254, 247, 224], fontStyle: 'bold', halign: 'center' };
         }
@@ -263,7 +263,7 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
     : [
         [
           {
-            content: 'No students below 40% attendance',
+            content: 'No students below 50% attendance',
             colSpan: 4,
             styles: { halign: 'center', textColor: [120, 120, 120] }
           }
@@ -306,14 +306,14 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
   const isYearly = month && month.length === 4;
   doc.setProperties({
     title: `UPAY ${isYearly ? 'Yearly' : 'Monthly'} Report - ${titleMonth}`,
-    subject: 'Attendance, student progress, volunteer contribution, and activity proof',
+    subject: 'Attendance and student progress',
     author: 'UPAY NGO'
   });
 
   addHeader(
     doc,
     `UPAY NGO ${isYearly ? 'Yearly' : 'Monthly'} Education Report`,
-    'Attendance, student progress, volunteer contribution, and activity proof are summarized in one operational view.',
+    'Attendance and student progress are summarized in one operational view.',
     titleMonth,
     filtersText
   );
@@ -323,14 +323,12 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
     { label: 'Total classes conducted', value: report.totalClasses },
     { label: 'Active students', value: students.length },
     { label: 'Average attendance', value: `${report.averageAttendance}%` },
-    { label: 'Intervention alerts', value: report.interventionStudents.length },
-    { label: 'Volunteer hours', value: `${report.volunteerHours}h` },
-    { label: 'Linked photos', value: report.photoCount }
+    { label: 'Intervention alerts', value: report.interventionStudents.length }
   ], cursorY);
 
   cursorY = addSectionTitle(doc, 'Executive summary', cursorY + 24);
   
-  const summaryText = `${students.length} active students, ${report.totalPresent} present records, and ${report.totalAbsent} absent records are accounted for in this period. A total of ${report.photoCount} photo proofs and ${report.volunteerHours} volunteer hours have been registered.`;
+  const summaryText = `${students.length} active students, ${report.totalPresent} present records, and ${report.totalAbsent} absent records are accounted for in this period.`;
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
@@ -374,38 +372,9 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
     }
   });
 
-  // Table 3: Volunteer Contribution
-  cursorY = addTable(doc, {
-    title: 'Volunteer contribution',
-    head: ['Volunteer', 'Role', 'Availability', 'Monthly Hours'],
-    body: volunteerRows,
-    startY: cursorY,
-    headFill: [166, 141, 113], // Sand Gold
-    columnStyles: {
-      0: { cellWidth: 150 },
-      1: { cellWidth: 120 },
-      2: { cellWidth: 150 },
-      3: { cellWidth: 92 }
-    }
-  });
-
-  // Table 4: Activity Photo Proof
-  cursorY = addTable(doc, {
-    title: 'Activity photo proof',
-    head: ['Activity Date', 'Activity', 'Caption'],
-    body: photoRows,
-    startY: cursorY,
-    headFill: [90, 115, 110], // Muted Green-Grey
-    columnStyles: {
-      0: { cellWidth: 90 },
-      1: { cellWidth: 150 },
-      2: { cellWidth: 272 }
-    }
-  });
-
   // Operational notes callout box
   const notesTitle = 'Operational notes';
-  const notesText = 'This document serves as the official monthly record for planning academic improvements, evaluating volunteer contributions, and tracking student intervention protocols.';
+  const notesText = 'This document serves as the official monthly record for planning academic improvements and tracking student intervention protocols.';
   
   if (cursorY > pageHeight - 110) {
     doc.addPage();
