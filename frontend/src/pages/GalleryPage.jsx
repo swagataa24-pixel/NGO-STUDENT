@@ -116,7 +116,7 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
       </div>
 
       <div className="container gallery-hero">
-        <div>
+        <header className="gallery-hero-copy">
           <span className="eyebrow">Media Archive</span>
           <h2>Visual proof, beautifully archived.</h2>
           <p>Explore verified moments from classes, outreach, and field activity without digging through a clunky folder dump.</p>
@@ -125,7 +125,7 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
             <span><strong>{uniqueActivities.length}</strong> activities</span>
             <span><strong>{filteredPhotos.length}</strong> visible</span>
           </div>
-        </div>
+        </header>
         <div className="hero-actions">
           <button
             className="primary-button"
@@ -305,10 +305,8 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
 
       <div className="container gallery-grid-container">
         <div className="gallery-grid-heading">
-          <div>
-            <span className="eyebrow">Field moments</span>
-            <h3>{filteredPhotos.length ? 'Latest visual records' : 'No matching records'}</h3>
-          </div>
+          <span className="eyebrow">Field moments</span>
+          <h3>{filteredPhotos.length ? 'Latest visual records' : 'No matching records'}</h3>
           <span className="gallery-count-pill">
             <ImageIcon size={16} /> {filteredPhotos.length} shown
           </span>
@@ -380,6 +378,7 @@ export function GalleryPage({ photos, setPhotos, classes = [] }) {
               <img src={selectedPhoto.imageUrl} alt={selectedPhoto.caption} />
             </div>
             <div className="photo-modal-info">
+              <span className="eyebrow">Proof details</span>
               <h3 className="photo-modal-caption">{selectedPhoto.caption}</h3>
               <div className="photo-modal-meta">
                 <div className="meta-row">
