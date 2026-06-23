@@ -3,7 +3,7 @@ import { Plus, X, Upload, Search, Calendar, Filter, Info, Image as ImageIcon, Sp
 import './GalleryPage.css';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { config } from '../config.js';
-import { mongoId } from '../utils/api.js';
+import { apiRequest, mongoId } from '../utils/api.js';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -18,6 +18,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
   const fileInputRef = useRef(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     className: 'all',
     activity: 'all',
@@ -100,20 +101,37 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
   const addPhoto = async (event) => {
     event.preventDefault();
     if (!draft.file || !draft.caption.trim()) return;
-    const imageUrl = await readFileAsDataUrl(draft.file);
-    const newPhoto = {
-      id: crypto.randomUUID(),
-      imageUrl,
-      caption: draft.caption,
-      center: draft.center || 'Unassigned center',
-      activity: draft.activity || 'Activity proof',
-      activityDate: new Date(`${draft.date}T12:00:00`).toISOString(),
-      date: draft.date,
-      uploadedBy: teacherIdentifier
-    };
-    setPhotos((items) => [newPhoto, ...items]);
-    setDraft({ caption: '', center: '', activity: '', date: today(), file: null });
-    setIsFormOpen(false);
+    setLoading(true);
+    try {
+      const imageUrl = await readFileAsDataUrl(draft.file);
+      const selectedClass = uniqueClasses.find(c => c.name === filters.className);
+      const response = await apiRequest(`${config.apiRoutes.photos}/upload`, {
+        method: 'POST',
+        body: JSON.stringify({
+          imageUrl,
+          caption: draft.caption,
+          center: draft.center || 'Unassigned center',
+          centerId: draft.center || 'Unassigned center',
+          className: selectedClass?.name || undefined,
+          activity: draft.activity || 'Activity proof',
+          activityDate: new Date(`${draft.date}T12:00:00`).toISOString(),
+          uploadedBy: teacherIdentifier
+        })
+      });
+
+      const newPhoto = {
+        ...response.photo,
+        id: response.photo?._id || response.photo?.id || crypto.randomUUID(),
+        date: draft.date
+      };
+      setPhotos((items) => [newPhoto, ...items]);
+      setDraft({ caption: '', center: '', activity: '', date: today(), file: null });
+      setIsFormOpen(false);
+    } catch (err) {
+      console.error('Failed to upload photo:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -234,8 +252,12 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
               </label>
             </div>
             <div className="form-actions">
-              <button className="primary-button" type="submit">
-                <Upload size={18} /> Save Proof
+              <button className="primary-button" type="submit" disabled={loading}>
+                {loading ? 'Uploading...' : (
+                  <>
+                    <Upload size={18} /> Save Proof
+                  </>
+                )}
               </button>
             </div>
           </form>

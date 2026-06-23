@@ -195,8 +195,10 @@ function App() {
   };
 
   useEffect(() => {
-    refreshData();
-  }, []);
+    if (activeUser) {
+      refreshData();
+    }
+  }, [activeUser]);
 
   return (
     <BrowserRouter>

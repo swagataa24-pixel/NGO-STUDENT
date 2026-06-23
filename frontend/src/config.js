@@ -29,6 +29,7 @@ export const config = {
     volunteers: import.meta.env.VITE_API_VOLUNTEERS_PATH || '/volunteers',
     users: import.meta.env.VITE_API_USERS_PATH || '/users',
     attendance: import.meta.env.VITE_API_ATTENDANCE_PATH || '/attendance',
+    attendanceSession: import.meta.env.VITE_API_ATTENDANCE_SESSION_PATH || '/attendance/session',
     authGoogle: import.meta.env.VITE_API_AUTH_GOOGLE_PATH || '/auth/google'
   }
 };

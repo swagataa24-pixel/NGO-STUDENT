@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Chrome, Eye, EyeOff, ShieldCheck, UserPlus, LogIn } from 'lucide-react';
 import { config } from '../config.js';
+import { apiRequest } from '../utils/api.js';
 import './LoginPage.css';
-
-const API = config.apiBaseUrl;
 
 export function LoginPage({ activeUser, setActiveUser }) {
   const navigate  = useNavigate();
@@ -45,19 +44,16 @@ export function LoginPage({ activeUser, setActiveUser }) {
         ? { name: form.name, email: form.email, password: form.password }
         : { email: form.email, password: form.password };
 
-      const res  = await fetch(`${API}${endpoint}`, {
+      const data  = await apiRequest(endpoint, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(body)
       });
-      const data = await res.json();
-      if (!res.ok) return setError(data.message || 'Authentication failed.');
 
       window.localStorage.setItem('upay.authToken', data.token);
       window.localStorage.setItem('upay.activeUser', JSON.stringify(data.user));
       setActiveUser(data.user);
-    } catch {
-      setError('Network error. Please check your connection.');
+    } catch (err) {
+      setError(err.message || 'Network error. Please check your connection.');
     } finally {
       setLoading(false);
     }
