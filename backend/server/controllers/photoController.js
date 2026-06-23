@@ -13,8 +13,8 @@ export async function index(req, res, next) {
 export async function upload(req, res, next) {
   try {
     if (!req.body.imageUrl) throw httpError(400, 'imageUrl is required until Cloudinary streaming is connected.');
-    const photoData = { ...req.body, uploadedBy: req.body.uploadedBy || req.user.name || req.user.email };
-    const created = await createPhoto(photoData);
+    const photoData = { ...req.body };
+    const created = await createPhoto(photoData, req.user);
     res.status(201).json({
       message: isCloudinaryConfigured() ? 'Photo uploaded and stored.' : 'Cloudinary is not configured. Saved as a local stub record.',
       photo: created
@@ -28,7 +28,7 @@ export async function destroy(req, res, next) {
   try {
     const { id } = req.params;
     if (!id) throw httpError(400, 'Photo ID is required.');
-    const deleted = await deletePhoto(id);
+    const deleted = await deletePhoto(id, req.user);
     if (!deleted) throw httpError(404, 'Photo not found.');
     res.json({ message: 'Photo deleted successfully.', photo: deleted });
   } catch (error) {

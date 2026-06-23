@@ -4,23 +4,50 @@ import { AttendanceSession } from '../models/AttendanceSession.js';
 import { Student } from '../models/Student.js';
 import { Report } from '../models/Report.js';
 
-export async function listClasses(filters = {}) {
+export async function listClasses(filters = {}, user = null) {
   const query = {};
   if (filters.centerId) query.centerId = filters.centerId;
   if (filters.activeOnly === 'true') query.activeStatus = true;
+  
+  // Teachers can only see their own classes; Admins see all
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.teacher = teacherIdentifier;
+  }
+  
   return ClassGroup.find(query).sort({ name: 1 });
 }
 
-export async function createClass(payload) {
+export async function createClass(payload, user = null) {
+  if (user) {
+    const teacherIdentifier = user.name || user.email;
+    payload.teacher = teacherIdentifier;
+  }
   return ClassGroup.create(payload);
 }
 
-export async function updateClass(id, payload) {
-  return ClassGroup.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+export async function updateClass(id, payload, user = null) {
+  let query = { _id: id };
+  
+  // Teachers can only update their own classes
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.teacher = teacherIdentifier;
+  }
+  
+  return ClassGroup.findOneAndUpdate(query, payload, { new: true, runValidators: true });
 }
 
-export async function archiveClass(id, activeStatus = false) {
-  const classGroup = await ClassGroup.findByIdAndUpdate(id, { activeStatus }, { new: true });
+export async function archiveClass(id, activeStatus = false, user = null) {
+  let query = { _id: id };
+  
+  // Teachers can only archive their own classes
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.teacher = teacherIdentifier;
+  }
+  
+  const classGroup = await ClassGroup.findOneAndUpdate(query, { activeStatus }, { new: true });
   if (classGroup && activeStatus === false) {
     await Student.updateMany(
       { $or: [{ classId: classGroup._id }, { className: classGroup.name }] },
@@ -30,8 +57,16 @@ export async function archiveClass(id, activeStatus = false) {
   return classGroup;
 }
 
-export async function deleteClass(id) {
-  const classGroup = await ClassGroup.findById(id);
+export async function deleteClass(id, user = null) {
+  let query = { _id: id };
+  
+  // Teachers can only delete their own classes
+  if (user && user.role === 'Teacher') {
+    const teacherIdentifier = user.name || user.email;
+    query.teacher = teacherIdentifier;
+  }
+  
+  const classGroup = await ClassGroup.findOne(query);
   if (!classGroup) return null;
 
   const relatedClassQuery = {

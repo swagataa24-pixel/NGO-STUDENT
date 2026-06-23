@@ -175,7 +175,7 @@ function App() {
         apiRequest(config.apiRoutes.classes),
         apiRequest(config.apiRoutes.photos).catch(() => []),
         apiRequest(config.apiRoutes.volunteers).catch(() => []),
-        apiRequest(config.apiRoutes.attendanceSession).catch(() => [])
+        apiRequest(config.apiRoutes.attendance).catch(() => [])
       ]);
       setStudents(studentData);
       setClasses(classData);

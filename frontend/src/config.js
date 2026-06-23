@@ -28,7 +28,7 @@ export const config = {
     photos: import.meta.env.VITE_API_PHOTOS_PATH || '/photos',
     volunteers: import.meta.env.VITE_API_VOLUNTEERS_PATH || '/volunteers',
     users: import.meta.env.VITE_API_USERS_PATH || '/users',
-    attendanceSession: import.meta.env.VITE_API_ATTENDANCE_SESSION_PATH || '/attendance/session',
+    attendance: import.meta.env.VITE_API_ATTENDANCE_PATH || '/attendance',
     authGoogle: import.meta.env.VITE_API_AUTH_GOOGLE_PATH || '/auth/google'
   }
 };

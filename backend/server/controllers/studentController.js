@@ -3,7 +3,7 @@ import { httpError } from '../utils/httpError.js';
 
 export async function index(req, res, next) {
   try {
-    res.json(await studentService.listStudents(req.query));
+    res.json(await studentService.listStudents(req.query, req.user));
   } catch (error) {
     next(error);
   }
@@ -12,7 +12,7 @@ export async function index(req, res, next) {
 export async function create(req, res, next) {
   try {
     if (!req.body.name) throw httpError(400, 'Student name is required.');
-    res.status(201).json(await studentService.createStudent(req.body));
+    res.status(201).json(await studentService.createStudent(req.body, req.user));
   } catch (error) {
     next(error);
   }
@@ -20,7 +20,7 @@ export async function create(req, res, next) {
 
 export async function show(req, res, next) {
   try {
-    const student = await studentService.getStudent(req.params.id);
+    const student = await studentService.getStudent(req.params.id, req.user);
     if (!student) throw httpError(404, 'Student not found.');
     res.json(student);
   } catch (error) {
@@ -30,7 +30,7 @@ export async function show(req, res, next) {
 
 export async function update(req, res, next) {
   try {
-    const student = await studentService.updateStudent(req.params.id, req.body);
+    const student = await studentService.updateStudent(req.params.id, req.body, req.user);
     if (!student) throw httpError(404, 'Student not found.');
     res.json(student);
   } catch (error) {
@@ -40,7 +40,7 @@ export async function update(req, res, next) {
 
 export async function archive(req, res, next) {
   try {
-    const student = await studentService.archiveStudent(req.params.id, req.body.activeStatus ?? false);
+    const student = await studentService.archiveStudent(req.params.id, req.body.activeStatus ?? false, req.user);
     if (!student) throw httpError(404, 'Student not found.');
     res.json(student);
   } catch (error) {
@@ -50,7 +50,7 @@ export async function archive(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
-    const student = await studentService.deleteStudent(req.params.id);
+    const student = await studentService.deleteStudent(req.params.id, req.user);
     if (!student) throw httpError(404, 'Student not found.');
     res.json({ message: 'Student deleted successfully.', student });
   } catch (error) {
