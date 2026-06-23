@@ -54,14 +54,20 @@ export async function resolveAuthenticatedUser(profile = {}) {
       { upsert: true, new: true, runValidators: false, setDefaultsOnInsert: true }
     );
 
+    // Check if user is blocked
+    if (doc.isBlocked) {
+      throw Object.assign(new Error('This account has been blocked. Contact an admin.'), { status: 403 });
+    }
+
     // Admin emails always stay Admin regardless of stored role
     if (role === 'Admin' && doc.role !== 'Admin') {
       doc.role = 'Admin';
       await User.findByIdAndUpdate(doc._id, { role: 'Admin' });
     }
 
-    return { id: String(doc._id), email: doc.email, name: doc.name, role: doc.role, avatar: doc.avatar || '' };
+    return { id: String(doc._id), email: doc.email, name: doc.name, role: doc.role, avatar: doc.avatar || '', isBlocked: doc.isBlocked };
   } catch (err) {
+    if (err.status === 403) throw err;
     return { id: idx, email, name: profile.name || 'UPAY User', role: resolveRole(email), avatar: '' };
   }
 }

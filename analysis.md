@@ -116,11 +116,22 @@ Change `config.apiRoutes.attendanceSession` to match backend route
      - Only admins see volunteer data in reports
    - **Volunteers**: Only admins can view, update, and delete volunteers
 
-3. **Frontend Fixes**:
+3. **User Blocking & Deletion**:
+   - **User Model**: Added `isBlocked` field (default false)
+   - **Backend Routes**:
+     - `PATCH /api/users/:id/block`: Toggle user block status (admin only)
+     - `DELETE /api/users/:id`: Permanently delete user (admin only)
+   - **Auth Checks**:
+     - `signinWithPassword`: Checks `isBlocked` before allowing login
+     - `resolveAuthenticatedUser`: Checks `isBlocked` for Google sign-in
+     - `requireAuth`: Now queries fresh user data from DB to check `isBlocked` on every authenticated request
+   - **Frontend UI**: AdminPage already has full UI for blocking, deleting, and editing users
+
+4. **Frontend Fixes**:
    - Fixed attendance API route config (added `apiRoutes.attendance` to `config.js`)
    - Updated class deletion logic to fully refresh all data via `refreshData()`
 
-4. **Backend Improvements**:
+5. **Backend Improvements**:
    - All service functions now accept and use `req.user` for ownership checks
    - Proper error handling for unauthorized access attempts
    - Improved consistency across all data models
