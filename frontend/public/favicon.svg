@@ -94,16 +94,12 @@
       <rect x="-60" y="-60" width="120" height="120" rx="30" fill="url(#goldPrimary)" transform="rotate(45)" />
       <!-- Inner indented detail -->
       <rect x="-52" y="-52" width="104" height="104" rx="26" fill="none" stroke="#6b4c10" stroke-width="2" transform="rotate(45)" opacity="0.4" />
+      
+      <!-- Central Aesthetic Symbol (Sparkle / 4-point star) -->
+      <path d="M 0,-36 C 4,-12 12,-4 36,0 C 12,4 4,12 0,36 C -4,12 -12,4 -36,0 C -12,-4 -4,-12 0,-36 Z" fill="#0c241e" filter="url(#innerShadow)" />
+      
+      <!-- Inner diamond -->
+      <rect x="-10" y="-10" width="20" height="20" rx="4" fill="url(#goldPrimary)" transform="rotate(45)" />
     </g>
-
-    <!-- Center Typography ('iP') -->
-    <text x="0" y="24" 
-          font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
-          font-size="68" 
-          font-weight="900" 
-          fill="#0c241e" 
-          text-anchor="middle" 
-          letter-spacing="-3"
-          filter="url(#innerShadow)">iP</text>
   </g>
 </svg>
