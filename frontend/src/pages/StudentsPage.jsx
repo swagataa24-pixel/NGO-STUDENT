@@ -181,7 +181,7 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
     if (!studentForm.name.trim() || !selectedClass) return;
     const payload = {
       ...studentForm,
-      photoUrl: studentForm.photoUrl || 'https://images.unsplash.com/photo-1607453998774-d533f65dac99?auto=format&fit=crop&w=600&q=80',
+      photoUrl: studentForm.photoUrl || '',
       centerId: selectedClass.centerId,
       classId: mongoId(selectedClass),
       className: selectedClass.name,
@@ -292,12 +292,12 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                   <input value={classForm.name} onChange={(event) => setClassForm((current) => ({ ...current, name: event.target.value }))} placeholder="Class 5" />
                 </label>
                 <label>
-                  <span>Teacher / Volunteer</span>
+                  <span>Assigned teacher</span>
                   <input
                     list="volunteer-teacher-options"
                     value={classForm.teacher}
                     onChange={(event) => setClassForm((current) => ({ ...current, teacher: event.target.value }))}
-                    placeholder={volunteers.length ? 'Select or type volunteer name' : 'Teacher name'}
+                    placeholder={volunteers.length ? 'Select or type teacher name' : 'Teacher name'}
                   />
                   {volunteers.length > 0 && (
                     <datalist id="volunteer-teacher-options">
@@ -307,7 +307,7 @@ export function StudentsPage({ students, setStudents, classes, setClasses, dataS
                     </datalist>
                   )}
                   {volunteers.length > 0 && (
-                    <small className="field-hint">Pick from registered volunteers.</small>
+                    <small className="field-hint">Pick from saved teacher profiles.</small>
                   )}
                 </label>
                 <label>

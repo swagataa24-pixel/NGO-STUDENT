@@ -17,9 +17,9 @@ export class ErrorBoundary extends React.Component {
         <main className="fatal-shell" role="alert" aria-live="assertive">
           <section className="fatal-card">
             <span className="eyebrow">Application error</span>
-            <h1>UPAY could not load this page.</h1>
+            <h1>upayinfoPVT could not load this page.</h1>
             <p>{this.state.error.message}</p>
-            <a className="primary-button" href="/" aria-label="Return to the UPAY home page">Return home</a>
+            <a className="primary-button" href="/" aria-label="Return to the upayinfoPVT home page">Return home</a>
           </section>
         </main>
       );

@@ -1,221 +1,113 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Chrome, Eye, EyeOff, ShieldCheck, UserPlus, LogIn } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShieldCheck } from 'lucide-react';
 import { config } from '../config.js';
 import { apiRequest } from '../utils/api.js';
 import './LoginPage.css';
 
-export function LoginPage({ activeUser, setActiveUser }) {
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const [mode, setMode]         = useState('signin'); // 'signin' | 'signup'
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [showPass, setShowPass] = useState(false);
-  const [showConf, setShowConf] = useState(false);
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19">
+      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.36l-3.24-2.54c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.07 12c0-.67.12-1.32.32-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.55l3.35-2.62Z" />
+      <path fill="#EA4335" d="M12 5.94c1.47 0 2.78.5 3.82 1.49l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z" />
+    </svg>
+  );
+}
 
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+function authErrorMessage(value) {
+  if (value === 'google_auth_failed') return 'Google sign-in was cancelled or could not be verified. Please try again.';
+  return value ? 'Sign-in could not be completed. Please try again.' : '';
+}
+
+export function LoginPage({ activeUser, setActiveUser }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const callbackCode = new URLSearchParams(location.hash.replace(/^#/, '')).get('code');
+  const [loading, setLoading] = useState(Boolean(callbackCode));
+  const [error, setError] = useState(authErrorMessage(params.get('error')));
 
   useEffect(() => {
-    if (activeUser) {
-      const from = location.state?.from || '/';
-      const timer = setTimeout(() => navigate(from, { replace: true }), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [activeUser, navigate, location]);
+    if (!callbackCode || activeUser) return undefined;
+    let cancelled = false;
 
-  const set = (key) => (e) => { setForm((f) => ({ ...f, [key]: e.target.value })); setError(''); };
-
-  const switchMode = (next) => { setMode(next); setError(''); setForm({ name: '', email: '', password: '', confirm: '' }); };
-
-  const googleAuth = () => { window.location.href = `${config.authBaseUrl}${config.apiRoutes.authGoogle}`; };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (mode === 'signup' && form.password !== form.confirm) {
-      return setError('Passwords do not match.');
-    }
-    if (form.password.length < 8) return setError('Password must be at least 8 characters.');
-    setLoading(true);
-    try {
-      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/signin';
-      const body = mode === 'signup'
-        ? { name: form.name, email: form.email, password: form.password }
-        : { email: form.email, password: form.password };
-
-      const data  = await apiRequest(endpoint, {
-        method:  'POST',
-        body:    JSON.stringify(body)
+    window.history.replaceState({}, document.title, location.pathname);
+    apiRequest(config.apiRoutes.authExchange, {
+      method: 'POST',
+      body: JSON.stringify({ code: callbackCode }),
+      skipAuthRedirect: true
+    })
+      .then((data) => {
+        if (cancelled) return;
+        window.sessionStorage.setItem('upayinfoPVT.authToken', data.token);
+        window.sessionStorage.setItem('upayinfoPVT.activeUser', JSON.stringify(data.user));
+        setActiveUser(data.user);
+      })
+      .catch((requestError) => {
+        if (!cancelled) setError(requestError.message || 'The sign-in link expired. Please try again.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
 
-      window.localStorage.setItem('upay.authToken', data.token);
-      window.localStorage.setItem('upay.activeUser', JSON.stringify(data.user));
-      setActiveUser(data.user);
-    } catch (err) {
-      setError(err.message || 'Network error. Please check your connection.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => { cancelled = true; };
+  }, [activeUser, callbackCode, location.pathname, setActiveUser]);
+
+  useEffect(() => {
+    if (!activeUser) return undefined;
+    const destination = location.state?.from || '/';
+    const timer = setTimeout(() => navigate(destination, { replace: true }), 350);
+    return () => clearTimeout(timer);
+  }, [activeUser, location.state, navigate]);
+
+  const googleAuth = () => window.location.assign(`${config.authBaseUrl}${config.apiRoutes.authGoogle}`);
 
   return (
     <section className="section auth-section">
       <div className="container auth-shell">
-
-        {/* ── Left visual panel ── */}
-        <div className={`auth-visual-panel ${mode === 'signup' ? 'mode-signup' : ''}`}>
+        <div className="auth-visual-panel">
           <div className="auth-glow" aria-hidden="true" />
           <div className="auth-rings" aria-hidden="true"><span /><span /><span /></div>
-          <div className="auth-orbit" aria-hidden="true"><span /><span /><span /></div>
-          <div className="auth-visual-content">
-            {mode === 'signin' ? (
-              <>
-                <span className="eyebrow">Welcome back</span>
-                <h2>Sign in to your workspace.</h2>
-                <p className="auth-visual-desc">Continue empowering classrooms, one session at a time.</p>
-              </>
-            ) : (
-              <>
-                <span className="eyebrow">Join UPAY</span>
-                <h2>Create your account.</h2>
-                <p className="auth-visual-desc">Register to become part of our volunteer educator network.</p>
-              </>
-            )}
+          <div className="auth-visual-copy">
+            <span className="eyebrow">Private teacher workspace</span>
+            <h2>{config.appName} attendance management.</h2>
+            <p className="auth-visual-desc">A personal tool for approved teachers to manage classes, attendance, students, and reports.</p>
           </div>
         </div>
 
-        {/* ── Right form panel ── */}
         <div className="auth-form-panel">
           {activeUser ? (
             <div className="signed-in-card">
               <div className="success-icon"><ShieldCheck size={34} /></div>
-              <span className="eyebrow">Secure Connection</span>
+              <span className="eyebrow">Identity verified</span>
               <h3>Welcome back</h3>
-              <p>Establishing workspace session...</p>
+              <p>{activeUser.role === 'Viewer' ? 'Your account is awaiting classroom access approval.' : 'Opening your workspace…'}</p>
               <div className="loader-bar"><div className="loader-progress" /></div>
             </div>
           ) : (
             <div className="auth-card">
-              {/* Mode toggle tabs */}
-              <div className="auth-tabs">
-                <button
-                  type="button"
-                  className={`auth-tab ${mode === 'signin' ? 'active' : ''}`}
-                  onClick={() => switchMode('signin')}
-                >
-                  <LogIn size={15} /> Sign In
-                </button>
-                <button
-                  type="button"
-                  className={`auth-tab ${mode === 'signup' ? 'active' : ''}`}
-                  onClick={() => switchMode('signup')}
-                >
-                  <UserPlus size={15} /> Sign Up
-                </button>
+              <h1 className="form-title">Sign in to {config.appName}</h1>
+              <p className="auth-intro">Use your verified Google account. New accounts receive no classroom access until the workspace owner approves them.</p>
+
+              {error && <p className="auth-error" role="alert">{error}</p>}
+
+              <button className="google-button" type="button" onClick={googleAuth} disabled={loading}>
+                <GoogleMark /> {loading ? 'Verifying with Google…' : 'Sign in with Google'}
+              </button>
+
+              <div className="portal-identity-note">
+                <strong>Know where you are signing in</strong>
+                <p>{config.appName} is an independently operated personal productivity tool hosted on Render, not a public or institution-operated service. Google authenticates your identity; this tool never asks for or receives your Google password.</p>
               </div>
 
-              {/* Sliding form viewport */}
-              <div className="form-viewport">
-                <div className={`form-slider ${mode === 'signup' ? 'shifted' : ''}`}>
-
-                  {/* ── Sign In panel ── */}
-                  <form className="auth-form-pane" onSubmit={handleSubmit} noValidate>
-                    <h1 className="form-title">Sign In</h1>
-                    <p className="auth-intro">Access your volunteer dashboard.</p>
-
-                    <div className="field-group">
-                      <label htmlFor="si-email">Email address</label>
-                      <input id="si-email" type="email" placeholder="you@example.com"
-                        value={mode === 'signin' ? form.email : ''} onChange={set('email')}
-                        autoComplete="email" required />
-                    </div>
-                    <div className="field-group">
-                      <label htmlFor="si-pass">Password</label>
-                      <div className="pass-wrap">
-                        <input id="si-pass" type={showPass ? 'text' : 'password'} placeholder="••••••••"
-                          value={mode === 'signin' ? form.password : ''} onChange={set('password')}
-                          autoComplete="current-password" required />
-                        <button type="button" className="eye-btn" onClick={() => setShowPass((v) => !v)} aria-label="Toggle password">
-                          {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {error && mode === 'signin' && <p className="auth-error">{error}</p>}
-
-                    <button className="primary-button submit-btn" type="submit" disabled={loading}>
-                      {loading ? 'Signing in…' : 'Sign In'}
-                    </button>
-
-                    <div className="divider-line"><span>or</span></div>
-
-                    <button className="google-button" type="button" onClick={googleAuth}>
-                      <Chrome size={19} /> Continue with Google
-                    </button>
-                  </form>
-
-                  {/* ── Sign Up panel ── */}
-                  <form className="auth-form-pane" onSubmit={handleSubmit} noValidate>
-                    <h1 className="form-title">Create Account</h1>
-                    <p className="auth-intro">New accounts join as <strong>Teacher / Volunteer</strong> with full access to operations.</p>
-
-                    <div className="field-group">
-                      <label htmlFor="su-name">Full name</label>
-                      <input id="su-name" type="text" placeholder="Priya Sharma"
-                        value={mode === 'signup' ? form.name : ''} onChange={set('name')}
-                        autoComplete="name" required />
-                    </div>
-                    <div className="field-group">
-                      <label htmlFor="su-email">Email address</label>
-                      <input id="su-email" type="email" placeholder="you@example.com"
-                        value={mode === 'signup' ? form.email : ''} onChange={set('email')}
-                        autoComplete="email" required />
-                    </div>
-                    <div className="field-group">
-                      <label htmlFor="su-pass">Password <span className="hint">(min 8 chars)</span></label>
-                      <div className="pass-wrap">
-                        <input id="su-pass" type={showPass ? 'text' : 'password'} placeholder="••••••••"
-                          value={mode === 'signup' ? form.password : ''} onChange={set('password')}
-                          autoComplete="new-password" required />
-                        <button type="button" className="eye-btn" onClick={() => setShowPass((v) => !v)} aria-label="Toggle password">
-                          {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <label htmlFor="su-conf">Confirm password</label>
-                      <div className="pass-wrap">
-                        <input id="su-conf" type={showConf ? 'text' : 'password'} placeholder="••••••••"
-                          value={mode === 'signup' ? form.confirm : ''} onChange={set('confirm')}
-                          autoComplete="new-password" required />
-                        <button type="button" className="eye-btn" onClick={() => setShowConf((v) => !v)} aria-label="Toggle confirm">
-                          {showConf ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {error && mode === 'signup' && <p className="auth-error">{error}</p>}
-
-                    <button className="primary-button submit-btn" type="submit" disabled={loading}>
-                      {loading ? 'Creating account…' : 'Create Account'}
-                    </button>
-
-                    <div className="divider-line"><span>or</span></div>
-
-                    <button className="google-button" type="button" onClick={googleAuth}>
-                      <Chrome size={19} /> Sign up with Google
-                    </button>
-                  </form>
-
-                </div>
-              </div>
-
-              <small className="auth-legal">By continuing, you agree to access UPAY NGO internal assets in compliance with organizational policies.</small>
+              <small className="auth-legal">
+                Authorized use only. Read our <Link to={config.routes.privacy}>privacy notice</Link> and <Link to={config.routes.terms}>portal terms</Link>.
+              </small>
             </div>
           )}
         </div>
-
       </div>
     </section>
   );

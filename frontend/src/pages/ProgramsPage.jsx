@@ -1,42 +1,29 @@
-import { ArrowUpRight, BarChart3, BookOpen, Camera, ClipboardList } from 'lucide-react';
+import { ArrowUpRight, BarChart3, Camera, ClipboardList, GraduationCap } from 'lucide-react';
+import { config } from '../config.js';
 import './ProgramsPage.css';
 
 export function ProgramsPage() {
-  const programs = [
-    [BookOpen, 'Reach and Teach', 'Dignified academic support and elementary education for children transitioning back to formal schooling.'],
-    [ClipboardList, 'Progress Tracking', 'Granular tracking of student literacy, cognitive development, behavior, and social integration milestones.'],
-    [Camera, 'Activity Verification', 'Securing on-site program updates with verified photo uploads, center data, and date metadata.'],
-    [BarChart3, 'Operational Review', 'Aggregating attendance rates, volunteer hours, and center logs into audited monthly review reports.']
+  const features = [
+    [ClipboardList, 'Fast attendance', 'Create dated sessions, mark present or absent, prevent duplicate entries, and retain a useful attendance history.'],
+    [GraduationCap, 'Class and student management', 'Group students into classes, maintain essential details, and keep teacher access scoped to assigned classes.'],
+    [Camera, 'Class activity records', 'Upload validated class photos and connect them with the relevant class, activity, and session date.'],
+    [BarChart3, 'Progress and reporting', 'Review attendance totals, add progress notes, identify patterns, and export monthly or yearly PDF summaries.']
   ];
 
   return (
     <section className="section tinted programs-section">
       <div className="container programs-showcase">
         <div className="programs-copy">
-          <span className="eyebrow">Initiatives</span>
-          <h2>Where teaching, proof, and progress move together.</h2>
-          <p>
-            UPAY's core programs connect daily classroom support with clean records,
-            verified activity proof, and monthly operational clarity.
-          </p>
-          <div className="programs-orbit" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
+          <span className="eyebrow">Features</span>
+          <h2>From the attendance register to the monthly summary.</h2>
+          <p>{config.appName} connects the routine pieces of classroom administration so information is entered once and remains useful.</p>
+          <div className="programs-orbit" aria-hidden="true"><span /><span /><span /></div>
         </div>
-
-        <div className="programs-flow" aria-label="Program initiatives">
-          {programs.map(([Icon, title, text], index) => (
+        <div className="programs-flow" aria-label="Workspace features">
+          {features.map(([Icon, title, text], index) => (
             <article className="program-flow-item" key={title} style={{ '--item-index': index }}>
-              <div className="program-flow-icon">
-                <Icon size={22} />
-              </div>
-              <div>
-                <span>0{index + 1}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
+              <div className="program-flow-icon"><Icon size={22} /></div>
+              <div><span>0{index + 1}</span><h3>{title}</h3><p>{text}</p></div>
               <ArrowUpRight className="program-flow-arrow" size={18} />
             </article>
           ))}

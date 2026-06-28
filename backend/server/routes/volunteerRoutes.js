@@ -4,7 +4,8 @@ import { requireAuth, requireRole } from '../middlewares/auth.js';
 
 export const volunteerRouter = Router();
 
-volunteerRouter.get('/',        requireAuth, volunteerController.index);
-volunteerRouter.post('/',       requireAuth, requireRole('Admin','Teacher'), volunteerController.create);
-volunteerRouter.put('/:id',     requireAuth, requireRole('Admin','Teacher'), volunteerController.update);
-volunteerRouter.delete('/:id',  requireAuth, requireRole('Admin'),           volunteerController.remove);
+volunteerRouter.use(requireAuth, requireRole('Admin'));
+volunteerRouter.get('/', volunteerController.index);
+volunteerRouter.post('/', volunteerController.create);
+volunteerRouter.put('/:id', volunteerController.update);
+volunteerRouter.delete('/:id', volunteerController.remove);

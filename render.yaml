@@ -1,16 +1,39 @@
 services:
   - type: static
-    name: upay-ngo-frontend
-    buildCommand: cd frontend && npm install && npm run build
+    name: upayinfopvt-frontend
+    buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
     autoDeploy: true
+    headers:
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com https://images.unsplash.com; connect-src 'self' https://upayinfopvt-backend.onrender.com; upgrade-insecure-requests"
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Cross-Origin-Opener-Policy
+        value: same-origin-allow-popups
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
   - type: web
-    name: upay-ngo-backend
+    name: upayinfopvt-backend
     env: node
     plan: starter
     rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm run start
     healthCheckPath: /api/health
     autoDeploy: true
@@ -19,3 +42,5 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: JWT_EXPIRES_IN
+        value: 1h

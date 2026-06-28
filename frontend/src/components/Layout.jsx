@@ -30,7 +30,7 @@ const operationsNavItems = [
   [config.routes.gallery, 'Gallery', Image]
 ];
 
-const adminOperationsNavItems = [[config.routes.volunteers, 'Manage Volunteers', Users]];
+const adminOperationsNavItems = [[config.routes.volunteers, 'Manage Teachers', Users]];
 
 const roleRank = { Viewer: 0, Teacher: 1, Admin: 2 };
 
@@ -76,10 +76,10 @@ export function Layout({ activeUser, onSignOut }) {
         Skip to content
       </a>
       <header className="app-header">
-        <NavLink className="brand" to={config.routes.home} onClick={() => setMenuOpen(false)} aria-label="UPAY home">
+        <NavLink className="brand" to={config.routes.home} onClick={() => setMenuOpen(false)} aria-label={`${config.appName} home`}>
           <span>
-            <strong>UPAY</strong>
-            <small>Education with dignity</small>
+            <strong>{config.appName}</strong>
+            <small>Teacher attendance workspace</small>
           </span>
         </NavLink>
         <div className="header-status" aria-label="Current account status">
@@ -171,33 +171,35 @@ export function Layout({ activeUser, onSignOut }) {
         <div className="footer-orb footer-orb-3"></div>
         <div className="container footer-grid">
           <div className="footer-brand-section">
-            <strong className="footer-title">UPAY</strong>
-            <p className="footer-desc">Restoring the promise of childhood by providing structured education, equal opportunities, and compassionate care to underserved communities.</p>
+            <strong className="footer-title">{config.appName}</strong>
+            <p className="footer-desc">A private personal workspace for taking attendance, organizing classes, managing student records, and reviewing teaching activity.</p>
           </div>
 
           <div className="footer-links-section">
             <h4>Quick Links</h4>
             <div className="footer-links">
               <NavLink to={config.routes.home}>Home</NavLink>
-              <NavLink to={config.routes.about}>Our Story</NavLink>
-              <NavLink to={config.routes.programs}>Programs</NavLink>
+              <NavLink to={config.routes.about}>About</NavLink>
+              <NavLink to={config.routes.programs}>Features</NavLink>
               <NavLink to={config.routes.gallery}>Gallery</NavLink>
+              <NavLink to={config.routes.privacy}>Privacy</NavLink>
+              <NavLink to={config.routes.terms}>Portal terms</NavLink>
             </div>
           </div>
 
           <div className="footer-accent-section">
             <span className="footer-tagline-sexy">
-              <span>empower</span>
+              <span>mark</span>
               <span className="bullet">·</span>
-              <span>educate</span>
+              <span>manage</span>
               <span className="bullet">·</span>
-              <span>elevate</span>
+              <span>review</span>
             </span>
           </div>
         </div>
         <div className="footer-bottom-bar">
           <div className="container">
-            <p>Designed with absolute dedication to child development and grassroots community support.</p>
+            <p>{config.appName} · Private teacher productivity workspace · Personal use only</p>
           </div>
         </div>
       </footer>

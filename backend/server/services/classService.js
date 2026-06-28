@@ -19,7 +19,7 @@ export async function listClasses(filters = {}, user = null) {
 }
 
 export async function createClass(payload, user = null) {
-  if (user) {
+  if (user?.role === 'Teacher') {
     const teacherIdentifier = user.name || user.email;
     payload.teacher = teacherIdentifier;
   }

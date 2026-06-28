@@ -1,8 +1,10 @@
 import { config } from '../config.js';
 
 function clearStoredSession() {
-  window.localStorage.removeItem('upay.authToken');
-  window.localStorage.removeItem('upay.activeUser');
+  window.sessionStorage.removeItem('upayinfoPVT.authToken');
+  window.sessionStorage.removeItem('upayinfoPVT.activeUser');
+  window.localStorage.removeItem('upayinfoPVT.authToken');
+  window.localStorage.removeItem('upayinfoPVT.activeUser');
 }
 
 export async function apiRequest(path, options = {}) {
@@ -11,23 +13,24 @@ export async function apiRequest(path, options = {}) {
 
   let response;
   try {
-    const token = window.localStorage.getItem('upay.authToken');
+    const token = window.sessionStorage.getItem('upayinfoPVT.authToken');
+    const { skipAuthRedirect = false, headers: optionHeaders = {}, ...fetchOptions } = options;
     response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options.headers || {})
+        ...optionHeaders
       },
-      ...options
+      credentials: 'include',
+      ...fetchOptions
     });
+
+    if (response.status === 401 && !skipAuthRedirect) {
+      clearStoredSession();
+      window.location.href = '/login';
+    }
   } catch (err) {
     throw new Error(`Network request failed: ${err.message}`);
-  }
-
-  // If 401 Unauthorized, clear session
-  if (response.status === 401) {
-    clearStoredSession();
-    window.location.href = '/login';
   }
 
   const data = await response.json().catch(() => null);

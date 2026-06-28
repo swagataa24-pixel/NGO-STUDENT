@@ -69,9 +69,9 @@ export function VolunteersPage({
         {filteredTeachers.length ? (
           <div className="teachers-grid">
             {filteredTeachers.map((teacher) => {
-              const teacherIdentifier = teacher.name || teacher.email;
+              const teacherIdentifiers = new Set([mongoId(teacher), teacher.name, teacher.email].filter(Boolean).map(String));
               const teacherAttendance = attendanceSessions.filter(
-                (session) => session.teacherId === teacherIdentifier
+                (session) => teacherIdentifiers.has(String(session.teacherId))
               );
               return (
                 <Link

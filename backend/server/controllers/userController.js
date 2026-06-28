@@ -1,12 +1,25 @@
 import { User } from '../models/User.js';
 import { httpError } from '../utils/httpError.js';
 import { assertAllowedRole } from '../utils/validators.js';
-import { hmacIndex, encrypt } from '../utils/cryptoService.js';
+import { hmacIndex } from '../utils/cryptoService.js';
+
+function adminUser(user) {
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isBlocked: Boolean(user.isBlocked),
+    accessApproved: Boolean(user.accessApproved),
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt
+  };
+}
 
 export async function index(_req, res, next) {
   try {
-    const users = await User.find().sort({ createdAt: -1 }).select('-password');
-    res.json(users);
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json(users.map(adminUser));
   } catch (error) {
     next(error);
   }
@@ -15,6 +28,10 @@ export async function index(_req, res, next) {
 export async function updateRole(req, res, next) {
   try {
     assertAllowedRole(req.body.role);
+
+    if (String(req.user.id) === String(req.params.id) && req.body.role !== 'Admin') {
+      throw httpError(400, 'You cannot remove your own administrator access.');
+    }
 
     if (req.body.role === 'Admin') {
       const userToUpdate = await User.findById(req.params.id);
@@ -26,7 +43,6 @@ export async function updateRole(req, res, next) {
         .filter(Boolean);
 
       // Compare by emailIndex since email is stored encrypted
-      const { hmacIndex: hi } = await import('../utils/cryptoService.js');
       const isAdmin = adminEmails.some((ae) => hmacIndex(ae) === userToUpdate.emailIndex);
       if (!isAdmin) {
         throw httpError(403, 'This user email is not authorized as an Admin in server configuration.');
@@ -35,11 +51,11 @@ export async function updateRole(req, res, next) {
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { role: req.body.role },
+      { role: req.body.role, accessApproved: ['Admin', 'Teacher'].includes(req.body.role) },
       { new: true, runValidators: true }
-    ).select('-password');
+    );
     if (!user) throw httpError(404, 'User not found.');
-    res.json(user);
+    res.json(adminUser(user));
   } catch (error) {
     next(error);
   }
@@ -47,11 +63,12 @@ export async function updateRole(req, res, next) {
 
 export async function blockUser(req, res, next) {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    if (String(req.user.id) === String(req.params.id)) throw httpError(400, 'You cannot block your own account.');
+    const user = await User.findById(req.params.id);
     if (!user) throw httpError(404, 'User not found.');
     user.isBlocked = !user.isBlocked;
     await user.save();
-    res.json(user);
+    res.json(adminUser(user));
   } catch (error) {
     next(error);
   }
@@ -59,6 +76,7 @@ export async function blockUser(req, res, next) {
 
 export async function deleteUser(req, res, next) {
   try {
+    if (String(req.user.id) === String(req.params.id)) throw httpError(400, 'You cannot delete your own account.');
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) throw httpError(404, 'User not found.');
     res.json({ message: 'User deleted successfully.' });
@@ -70,19 +88,17 @@ export async function deleteUser(req, res, next) {
 export async function updateDetails(req, res, next) {
   try {
     const { name, email } = req.body;
+    if (email) throw httpError(400, 'Google-authenticated email addresses cannot be edited manually.');
     const update = {};
     if (name)  update.name = name;
-    if (email) {
-      update.email      = email;
-      update.emailIndex = hmacIndex(String(email).trim().toLowerCase());
-    }
+    if (!name) throw httpError(400, 'A name is required.');
     const user = await User.findByIdAndUpdate(
       req.params.id,
       update,
       { new: true, runValidators: false }
-    ).select('-password');
+    );
     if (!user) throw httpError(404, 'User not found.');
-    res.json(user);
+    res.json(adminUser(user));
   } catch (error) {
     next(error);
   }

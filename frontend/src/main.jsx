@@ -8,7 +8,7 @@ import { config } from './config.js';
 import { apiRequest } from './utils/api.js';
 import './styles.css';
 
-const CHUNK_RELOAD_KEY = 'upay.chunkReloaded';
+const CHUNK_RELOAD_KEY = 'upayinfoPVT.chunkReloaded';
 
 function lazyRoute(importPage, exportName) {
   return lazy(() =>
@@ -43,6 +43,8 @@ const ReportsPage = lazyRoute(() => import('./pages/ReportsPage.jsx'), 'ReportsP
 const GalleryPage = lazyRoute(() => import('./pages/GalleryPage.jsx'), 'GalleryPage');
 const AdminPage = lazyRoute(() => import('./pages/AdminPage.jsx'), 'AdminPage');
 const LoginPage = lazyRoute(() => import('./pages/LoginPage.jsx'), 'LoginPage');
+const PrivacyPage = lazyRoute(() => import('./pages/PrivacyPage.jsx'), 'PrivacyPage');
+const TermsPage = lazyRoute(() => import('./pages/TermsPage.jsx'), 'TermsPage');
 
 function RouteLoader() {
   return (
@@ -100,32 +102,28 @@ function AccessRoute({ activeUser, allowedRoles, children }) {
   return children;
 }
 
-function decodeAuthUser(encodedUser) {
-  const normalized = encodedUser.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
-  return JSON.parse(window.atob(padded));
-}
-
 function readStoredSession() {
   try {
-    const token = window.localStorage.getItem('upay.authToken');
-    const storedUser = window.localStorage.getItem('upay.activeUser');
+    const token = window.sessionStorage.getItem('upayinfoPVT.authToken');
+    const storedUser = window.sessionStorage.getItem('upayinfoPVT.activeUser');
     if (token && storedUser) {
       return JSON.parse(storedUser);
     }
     if (!token && storedUser) {
-      window.localStorage.removeItem('upay.activeUser');
+      window.sessionStorage.removeItem('upayinfoPVT.activeUser');
     }
   } catch {
-    window.localStorage.removeItem('upay.authToken');
-    window.localStorage.removeItem('upay.activeUser');
+    window.sessionStorage.removeItem('upayinfoPVT.authToken');
+    window.sessionStorage.removeItem('upayinfoPVT.activeUser');
   }
   return null;
 }
 
 function clearStoredSession() {
-  window.localStorage.removeItem('upay.authToken');
-  window.localStorage.removeItem('upay.activeUser');
+  window.sessionStorage.removeItem('upayinfoPVT.authToken');
+  window.sessionStorage.removeItem('upayinfoPVT.activeUser');
+  window.localStorage.removeItem('upayinfoPVT.authToken');
+  window.localStorage.removeItem('upayinfoPVT.activeUser');
 }
 
 function App() {
@@ -138,27 +136,24 @@ function App() {
   const [dataStatus, setDataStatus] = useState({ loading: true, error: '' });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const encodedUser = params.get('user');
-
-    if (token && encodedUser) {
-      try {
-        const user = decodeAuthUser(encodedUser);
-        window.localStorage.setItem('upay.authToken', token);
-        window.localStorage.setItem('upay.activeUser', JSON.stringify(user));
-        setActiveUser(user);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch {
-        clearStoredSession();
-        setActiveUser(null);
-      }
-    }
+    if (!activeUser) return undefined;
+    let cancelled = false;
+    apiRequest(config.apiRoutes.authMe)
+      .then(({ user }) => {
+        if (!cancelled) setActiveUser(user);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          clearStoredSession();
+          setActiveUser(null);
+        }
+      });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     if (activeUser) {
-      window.localStorage.setItem('upay.activeUser', JSON.stringify(activeUser));
+      window.sessionStorage.setItem('upayinfoPVT.activeUser', JSON.stringify(activeUser));
     }
   }, [activeUser]);
 
@@ -195,8 +190,10 @@ function App() {
   };
 
   useEffect(() => {
-    if (activeUser) {
+    if (activeUser && ['Admin', 'Teacher'].includes(activeUser.role)) {
       refreshData();
+    } else {
+      setDataStatus({ loading: false, error: '' });
     }
   }, [activeUser]);
 
@@ -309,6 +306,8 @@ function App() {
               }
             />
             <Route path={config.routes.login.replace(/^\//, '')} element={<LoginPage activeUser={activeUser} setActiveUser={setActiveUser} />} />
+            <Route path={config.routes.privacy.replace(/^\//, '')} element={<PrivacyPage />} />
+            <Route path={config.routes.terms.replace(/^\//, '')} element={<TermsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

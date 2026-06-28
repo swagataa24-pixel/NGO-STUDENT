@@ -1,7 +1,7 @@
 import { ActivityPhoto } from '../models/ActivityPhoto.js';
 import { ClassGroup } from '../models/ClassGroup.js';
 import { Report } from '../models/Report.js';
-import { buildCloudinaryStubUpload, describeCloudinaryStatus, isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
+import { describeCloudinaryStatus, isCloudinaryConfigured, storeTrustedImage } from './cloudinaryService.js';
 import mongoose from 'mongoose';
 
 export async function listPhotos(filters = {}, user = null) {
@@ -34,18 +34,9 @@ export async function listPhotos(filters = {}, user = null) {
 }
 
 export async function createPhoto(payload, user = null) {
-  let imageUrl = payload.imageUrl || '';
-  let cloudinaryPublicId = '';
-
-  if (isCloudinaryConfigured() && imageUrl.startsWith('data:')) {
-    try {
-      const result = await uploadToCloudinary(imageUrl);
-      imageUrl = result.url;
-      cloudinaryPublicId = result.publicId;
-    } catch (err) {
-      console.error('Cloudinary upload failed, falling back to local base64 storage:', err.message);
-    }
-  }
+  const storedImage = await storeTrustedImage(payload.imageUrl || '');
+  const imageUrl = storedImage.url;
+  const cloudinaryPublicId = storedImage.publicId;
   
   // Teachers can only upload photos to their own classes
   if (user && user.role === 'Teacher') {

@@ -40,7 +40,7 @@ function addHeader(doc, title, subtitle, monthLabel, filtersText) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(197, 168, 128); // Light Gold #C5A880
-  doc.text('UPAY NGO — OPERATIONAL DATA PORTAL', 58, 60);
+  doc.text('upayinfoPVT — TEACHER ATTENDANCE WORKSPACE', 58, 60);
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
@@ -280,7 +280,7 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
     : [
         [
           {
-            content: 'No volunteer records found',
+            content: 'No teacher activity records found',
             colSpan: 4,
             styles: { halign: 'center', textColor: [120, 120, 120] }
           }
@@ -305,14 +305,14 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
 
   const isYearly = month && month.length === 4;
   doc.setProperties({
-    title: `UPAY ${isYearly ? 'Yearly' : 'Monthly'} Report - ${titleMonth}`,
+    title: `upayinfoPVT ${isYearly ? 'Yearly' : 'Monthly'} Report - ${titleMonth}`,
     subject: 'Attendance and student progress',
-    author: 'UPAY NGO'
+    author: 'upayinfoPVT'
   });
 
   addHeader(
     doc,
-    `UPAY NGO ${isYearly ? 'Yearly' : 'Monthly'} Education Report`,
+    `upayinfoPVT ${isYearly ? 'Yearly' : 'Monthly'} Attendance Report`,
     'Attendance and student progress are summarized in one operational view.',
     titleMonth,
     filtersText
@@ -374,7 +374,7 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
 
   // Operational notes callout box
   const notesTitle = 'Operational notes';
-  const notesText = 'This document serves as the official monthly record for planning academic improvements and tracking student intervention protocols.';
+  const notesText = 'This personal-use summary helps the teacher review attendance, progress, and follow-up needs for the selected period.';
   
   if (cursorY > pageHeight - 110) {
     doc.addPage();
@@ -429,9 +429,9 @@ export function downloadMonthlyReportPdf({ students, photos, volunteers = [], mo
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(120, 130, 128);
-    doc.text('UPAY NGO — Confidential Operational Report', margin, 822);
+    doc.text('upayinfoPVT — Private Classroom Report', margin, 822);
     doc.text(`Page ${page} of ${pageCount}`, pageWidth - margin - 54, 822);
   }
 
-  doc.save(`UPAY-Monthly-Report-${month || 'current'}.pdf`);
+  doc.save(`upayinfoPVT-Attendance-Report-${month || 'current'}.pdf`);
 }

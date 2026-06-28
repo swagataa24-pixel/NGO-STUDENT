@@ -33,8 +33,8 @@ export function VolunteerDetailPage({ attendanceSessions = [], photos = [], data
 
   const teacherAttendance = useMemo(() => {
     if (!teacher) return [];
-    const teacherIdentifier = teacher.name || teacher.email;
-    return attendanceSessions.filter((session) => session.teacherId === teacherIdentifier);
+    const teacherIdentifiers = new Set([mongoId(teacher), teacher.name, teacher.email].filter(Boolean).map(String));
+    return attendanceSessions.filter((session) => teacherIdentifiers.has(String(session.teacherId)));
   }, [attendanceSessions, teacher]);
 
   const teacherPhotos = useMemo(() => {
@@ -124,9 +124,9 @@ export function VolunteerDetailPage({ attendanceSessions = [], photos = [], data
             <div className="photos-grid">
               {teacherPhotos.sort((a, b) => new Date(b.activityDate || b.date) - new Date(a.activityDate || a.date)).map((photo) => (
                 <div key={mongoId(photo) || photo.id || photo.imageUrl} className="photo-card">
-                  <img src={photo.imageUrl} alt={photo.caption || photo.activity || 'Activity photo'} />
+                  <img src={photo.imageUrl} alt={photo.caption || photo.activity || 'Class activity photo'} />
                   <div className="photo-details">
-                    <p className="photo-caption">{photo.caption || photo.activity || 'Activity proof'}</p>
+                    <p className="photo-caption">{photo.caption || photo.activity || 'Class activity'}</p>
                     <p className="photo-date">{formatDate(photo.activityDate || photo.date)}</p>
                   </div>
                 </div>

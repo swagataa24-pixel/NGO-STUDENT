@@ -1,32 +1,34 @@
-# UPAY NGO
+# upayinfoPVT
 
-This repository contains two separate apps for the UPAY NGO operations portal:
+`upayinfoPVT` is a private, personal classroom-management workspace focused on helping teachers take attendance and keep daily teaching records organized.
 
-- `frontend`: Vite + React app
-- `backend`: Node.js + Express API
+The repository contains:
 
-They are kept separate so the frontend and backend can be hosted separately.
+- `frontend`: React + Vite interface
+- `backend`: Express + MongoDB API
 
-## Local Backend
+Core features include Google sign-in, approval-based roles, classes, student records, attendance sessions, progress notes, teacher profiles, activity photos, dashboards, and PDF reports.
 
-```bash
+## Local development
+
+```powershell
 cd backend
-cp .env.example .env
-npm install
+npm ci
 npm run dev
 ```
 
-## Local Frontend
-
-```bash
+```powershell
 cd frontend
-cp .env.example .env
-npm install
+npm ci
 npm run dev
 ```
 
-## Notes
+The frontend defaults to `http://localhost:5173`; the backend defaults to `http://localhost:5000`.
 
-- Backend readiness is exposed at `GET /api/health`.
-- Frontend expects `VITE_API_BASE_URL` to point to the backend.
-- Do not commit secret values. Use environment variables in production.
+## Security notes
+
+- Google OAuth is the only login method.
+- New accounts are Viewers until the workspace owner approves Teacher access.
+- Production startup fails when required secrets or OAuth configuration are missing or weak.
+- Never commit `.env` files or share tokens, database URIs, encryption keys, or OAuth secrets.
+- Review [replace.md](./replace.md) and [SECURITY_DEPLOYMENT.md](./SECURITY_DEPLOYMENT.md) before deployment.

@@ -1,14 +1,16 @@
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import { AuthCode } from '../models/AuthCode.js';
 import { User } from '../models/User.js';
-import { hmacIndex, encrypt } from '../utils/cryptoService.js';
+import { hmacIndex } from '../utils/cryptoService.js';
+import { httpError } from '../utils/httpError.js';
 
-const SALT_ROUNDS = 12;
+const AUTH_CODE_TTL_MS = 2 * 60 * 1000;
 
 function parseAdminEmails() {
   return (process.env.ADMIN_EMAILS || '')
     .split(',')
-    .map((e) => e.trim().toLowerCase())
+    .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 }
 
@@ -16,105 +18,96 @@ function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
 
-function resolveRole(email) {
-  return parseAdminEmails().includes(normalizeEmail(email)) ? 'Admin' : 'Teacher';
+function provisionedRole(email) {
+  return parseAdminEmails().includes(normalizeEmail(email)) ? 'Admin' : 'Viewer';
 }
 
-export function buildToken(user) {
-  return jwt.sign(
-    { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
-    process.env.JWT_SECRET || 'dev-secret',
-    { expiresIn: '8h' }
-  );
-}
-
-// ─── Google OAuth ──────────────────────────────────────────────────────────────
-
-export async function resolveAuthenticatedUser(profile = {}) {
-  const email = normalizeEmail(profile.email || '');
-  const idx   = hmacIndex(email);
-
-  if (!email) {
-    return { id: 'unknown', email: '', name: profile.name || 'UPAY User', role: 'Viewer', avatar: '' };
-  }
-
-  try {
-    const role = resolveRole(email);
-    const doc  = await User.findOneAndUpdate(
-      { emailIndex: idx },
-      {
-        $setOnInsert: { emailIndex: idx, role },
-        $set: {
-          name:     profile.name   || 'UPAY User',
-          email,
-          avatar:   profile.avatar || '',
-          googleId: profile.googleId || ''
-        }
-      },
-      { upsert: true, new: true, runValidators: false, setDefaultsOnInsert: true }
-    );
-
-    // Check if user is blocked
-    if (doc.isBlocked) {
-      throw Object.assign(new Error('This account has been blocked. Contact an admin.'), { status: 403 });
-    }
-
-    // Admin emails always stay Admin regardless of stored role
-    if (role === 'Admin' && doc.role !== 'Admin') {
-      doc.role = 'Admin';
-      await User.findByIdAndUpdate(doc._id, { role: 'Admin' });
-    }
-
-    return { id: String(doc._id), email: doc.email, name: doc.name, role: doc.role, avatar: doc.avatar || '', isBlocked: doc.isBlocked };
-  } catch (err) {
-    if (err.status === 403) throw err;
-    return { id: idx, email, name: profile.name || 'UPAY User', role: resolveRole(email), avatar: '' };
-  }
-}
-
-export function resolveGoogleProfile(body = {}) {
+export function publicUser(user) {
   return {
-    name:     body.name     || 'UPAY User',
-    email:    normalizeEmail(body.email || ''),
-    avatar:   body.avatar   || '',
-    googleId: body.googleId || ''
+    id: String(user._id || user.id),
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    avatar: user.avatar || '',
+    isBlocked: Boolean(user.isBlocked)
   };
 }
 
-// ─── Email / Password Auth ─────────────────────────────────────────────────────
-
-export async function signupWithPassword({ name, email, password }) {
-  const normEmail = normalizeEmail(email);
-  const idx       = hmacIndex(normEmail);
-
-  const existing = await User.findOne({ emailIndex: idx });
-  if (existing) throw Object.assign(new Error('An account with this email already exists.'), { status: 409 });
-
-  const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-  const role   = resolveRole(normEmail);
-
-  const doc = await User.create({
-    name,
-    email:      normEmail,
-    emailIndex: idx,
-    password:   hashed,
-    role
-  });
-
-  return { id: String(doc._id), email: doc.email, name: doc.name, role: doc.role, avatar: '' };
+export function buildToken(user) {
+  const secret = process.env.JWT_SECRET || 'development-only-jwt-secret';
+  const safeUser = publicUser(user);
+  return jwt.sign(
+    { id: safeUser.id },
+    secret,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1h', issuer: 'upayinfopvt-api', audience: 'upayinfopvt-workspace' }
+  );
 }
 
-export async function signinWithPassword({ email, password }) {
-  const normEmail = normalizeEmail(email);
-  const idx       = hmacIndex(normEmail);
+export async function resolveAuthenticatedUser(profile = {}) {
+  const email = normalizeEmail(profile.email);
+  if (!email) throw httpError(400, 'Google did not provide a usable email address.');
 
-  const doc = await User.findOne({ emailIndex: idx }).select('+password');
-  if (!doc) throw Object.assign(new Error('Invalid email or password.'), { status: 401 });
-  if (doc.isBlocked) throw Object.assign(new Error('This account has been blocked. Contact an admin.'), { status: 403 });
-  if (!doc.password) throw Object.assign(new Error('This account uses Google Sign-In. Please sign in with Google.'), { status: 400 });
+  const emailIndex = hmacIndex(email);
+  const desiredRole = provisionedRole(email);
+  let user = await User.findOne({ emailIndex });
 
-  const valid = await bcrypt.compare(password, doc.password);
-  if (!valid) throw Object.assign(new Error('Invalid email or password.'), { status: 401 });
+  if (!user) {
+    user = new User({
+      name: profile.name || 'Workspace User',
+      email,
+      emailIndex,
+      avatar: profile.avatar || '',
+      googleId: profile.googleId || '',
+      role: desiredRole,
+      accessApproved: desiredRole === 'Admin'
+    });
+  } else {
+    if (user.isBlocked) throw httpError(403, 'This account has been blocked. Contact an administrator.');
+    if (user.googleId && profile.googleId && user.googleId !== profile.googleId) {
+      throw httpError(409, 'This email is already linked to a different Google account.');
+    }
+    user.name = profile.name || user.name;
+    user.avatar = profile.avatar || user.avatar;
+    user.googleId = profile.googleId || user.googleId;
+    if (desiredRole === 'Admin') {
+      user.role = 'Admin';
+      user.accessApproved = true;
+    } else if (!user.accessApproved) {
+      user.role = 'Viewer';
+    }
+  }
 
-  return { id: String(doc._id), email: doc.email, name: doc.name, role: doc.role, avatar: doc.avatar || '' };
+  await user.save();
+  return publicUser(user);
+}
+
+function hashCode(code) {
+  return crypto.createHash('sha256').update(code).digest('hex');
+}
+
+export async function createOneTimeAuthCode(user) {
+  const code = crypto.randomBytes(32).toString('base64url');
+  await AuthCode.create({
+    codeHash: hashCode(code),
+    userId: user.id,
+    expiresAt: new Date(Date.now() + AUTH_CODE_TTL_MS)
+  });
+  return code;
+}
+
+export async function exchangeOneTimeAuthCode(code) {
+  if (typeof code !== 'string' || code.length < 32 || code.length > 128) {
+    throw httpError(400, 'Invalid authentication code.');
+  }
+
+  const record = await AuthCode.findOneAndDelete({
+    codeHash: hashCode(code),
+    expiresAt: { $gt: new Date() }
+  });
+  if (!record) throw httpError(401, 'Authentication code is invalid, expired, or already used.');
+
+  const user = await User.findById(record.userId);
+  if (!user || user.isBlocked) throw httpError(403, 'This account is not allowed to sign in.');
+
+  return { user: publicUser(user), token: buildToken(user), expiresIn: process.env.JWT_EXPIRES_IN || '1h' };
 }

@@ -13,9 +13,9 @@ const userSchema = new mongoose.Schema(
     email:      { type: String, required: true },        // stored encrypted
     emailIndex: { type: String, required: true, unique: true }, // HMAC blind index for lookups
     role:       { type: String, enum: ['Admin', 'Teacher', 'Viewer'], default: 'Viewer' },
-    password:   { type: String },                        // bcrypt hash (email/password users)
     googleId:   { type: String },
     avatar:     { type: String },
+    accessApproved: { type: Boolean, default: false },
     isBlocked:  { type: Boolean, default: false }
   },
   { timestamps: true }
@@ -34,9 +34,13 @@ userSchema.pre('save', function (next) {
 
 userSchema.pre('findOneAndUpdate', function (next) {
   const upd = this.getUpdate();
-  if (upd?.name   && !isEncrypted(upd.name))   upd.name   = encrypt(upd.name);
-  if (upd?.email  && !isEncrypted(upd.email))  { upd.emailIndex = hmacIndex(upd.email); upd.email = encrypt(upd.email); }
-  if (upd?.avatar && !isEncrypted(upd.avatar)) upd.avatar = encrypt(upd.avatar);
+  const values = upd?.$set || upd || {};
+  if (values.name && !isEncrypted(values.name)) values.name = encrypt(values.name);
+  if (values.email && !isEncrypted(values.email)) {
+    values.emailIndex = hmacIndex(values.email);
+    values.email = encrypt(values.email);
+  }
+  if (values.avatar && !isEncrypted(values.avatar)) values.avatar = encrypt(values.avatar);
   next();
 });
 

@@ -45,7 +45,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
 
   const uniqueClasses = useMemo(() => teacherClasses.map(c => ({ id: mongoId(c), name: c.name })), [teacherClasses]);
   const uniqueActivities = useMemo(() => {
-    const activities = new Set(photos.map(p => p.activity || 'Activity proof').filter(Boolean));
+    const activities = new Set(photos.map(p => p.activity || 'Class activity').filter(Boolean));
     return Array.from(activities);
   }, [photos]);
 
@@ -77,7 +77,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
 
       // Activity filter
       if (filters.activity !== 'all') {
-        const photoActivity = photo.activity || 'Activity proof';
+        const photoActivity = photo.activity || 'Class activity';
         if (photoActivity !== filters.activity) return false;
       }
 
@@ -127,10 +127,10 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
         body: JSON.stringify({
           imageUrl,
           caption: draft.caption,
-          center: draft.center || 'Unassigned center',
-          centerId: draft.center || 'Unassigned center',
+          center: draft.center || 'Personal classroom',
+          centerId: draft.center || 'Personal classroom',
           className: selectedClass?.name || undefined,
-          activity: draft.activity || 'Activity proof',
+          activity: draft.activity || 'Class activity',
           activityDate: new Date(`${draft.date}T12:00:00`).toISOString(),
           uploadedBy: teacherIdentifier
         })
@@ -162,10 +162,10 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
       <div className="container gallery-hero">
         <header className="gallery-hero-copy">
           <span className="eyebrow">Media Archive</span>
-          <h2>Visual proof, beautifully archived.</h2>
-          <p>Explore verified moments from classes, outreach, and field activity without digging through a clunky folder dump.</p>
+          <h2>Keep useful class photos organized.</h2>
+          <p>Store optional classroom images with their date, class, and activity so they remain easy to find later.</p>
           <div className="gallery-hero-stats" aria-label="Gallery summary">
-            <span><strong>{photos.length}</strong> proofs</span>
+            <span><strong>{photos.length}</strong> photos</span>
             <span><strong>{uniqueActivities.length}</strong> activities</span>
             <span><strong>{filteredPhotos.length}</strong> visible</span>
           </div>
@@ -181,7 +181,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
               </>
             ) : (
               <>
-                <Plus size={18} /> Upload New Proof
+                <Plus size={18} /> Upload Class Photo
               </>
             )}
           </button>
@@ -193,7 +193,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
           <form className="soft-card form-card" onSubmit={addPhoto}>
             <div className="form-header">
               <div>
-                <h3>Add New Activity Proof</h3>
+                <h3>Add Class Photo</h3>
                 <p>Upload and preserve visual evidence of your program delivery</p>
               </div>
               <button
@@ -206,7 +206,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
             </div>
             <div className="form-grid">
               <label className="file-upload-label">
-                <span>Upload Photo Proof</span>
+                <span>Choose Class Photo</span>
                 <div className="file-upload-zone" onClick={() => fileInputRef.current?.click()}>
                   {previewUrl ? (
                     <div className="preview-container">
@@ -237,12 +237,12 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
                 />
               </label>
               <label>
-                <span>Center Location</span>
+                <span>Classroom / Location</span>
                 <input
                   type="text"
                   value={draft.center}
                   onChange={(event) => setDraft((current) => ({ ...current, center: event.target.value }))}
-                  placeholder="Center name"
+                  placeholder="Classroom or location"
                 />
               </label>
               <label>
@@ -254,8 +254,8 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
                   <option value="">Select or type</option>
                   <option>Class session</option>
                   <option>Teacher training</option>
-                  <option>Community outreach</option>
-                  <option>Volunteer meetup</option>
+                  <option>Class activity</option>
+                  <option>Teacher meeting</option>
                   <option>Special event</option>
                 </select>
               </label>
@@ -272,7 +272,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
               <button className="primary-button" type="submit" disabled={loading}>
                 {loading ? 'Uploading...' : (
                   <>
-                    <Upload size={18} /> Save Proof
+                    <Upload size={18} /> Save Photo
                   </>
                 )}
               </button>
@@ -394,8 +394,8 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
               <figcaption className="photo-details">
                 <strong className="photo-caption">{photo.caption}</strong>
                 <div className="photo-meta">
-                  <span className="meta-item"><Sparkles size={13} /> {photo.activity || 'Activity proof'}</span>
-                  <span className="meta-item">{photo.center || photo.centerId || 'Unassigned center'}</span>
+                  <span className="meta-item"><Sparkles size={13} /> {photo.activity || 'Class activity'}</span>
+                  <span className="meta-item">{photo.center || photo.centerId || 'Personal classroom'}</span>
                 </div>
               </figcaption>
             </figure>
@@ -426,7 +426,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
               <img src={selectedPhoto.imageUrl} alt={selectedPhoto.caption} />
             </div>
             <div className="photo-modal-info">
-              <span className="eyebrow">Proof details</span>
+              <span className="eyebrow">Photo details</span>
               <h3 className="photo-modal-caption">{selectedPhoto.caption}</h3>
               <div className="photo-modal-meta">
                 <div className="meta-row">
@@ -434,7 +434,7 @@ export function GalleryPage({ activeUser, photos, setPhotos, classes = [] }) {
                   <span className="meta-row-value">{selectedPhoto.activity}</span>
                 </div>
                 <div className="meta-row">
-                  <span className="meta-row-label">Center</span>
+                  <span className="meta-row-label">Classroom</span>
                   <span className="meta-row-value">{selectedPhoto.center || selectedPhoto.centerId}</span>
                 </div>
                 <div className="meta-row">

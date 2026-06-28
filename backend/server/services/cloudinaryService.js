@@ -1,8 +1,49 @@
 import crypto from 'node:crypto';
 import https from 'node:https';
+import { httpError } from '../utils/httpError.js';
 
 export function isCloudinaryConfigured() {
   return Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+}
+
+const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
+const DATA_IMAGE_RE = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/;
+
+function validateDataImage(dataUrl) {
+  const match = DATA_IMAGE_RE.exec(String(dataUrl || ''));
+  if (!match) throw httpError(400, 'Only JPEG, PNG, and WebP image uploads are allowed.');
+  const estimatedBytes = Math.floor((match[2].length * 3) / 4);
+  if (estimatedBytes > MAX_IMAGE_BYTES) throw httpError(413, 'Image must be 6 MB or smaller.');
+}
+
+export function isApprovedCloudinaryUrl(value) {
+  try {
+    const url = new URL(value);
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    return url.protocol === 'https:' && url.hostname === 'res.cloudinary.com' && Boolean(cloudName) && url.pathname.startsWith(`/${cloudName}/image/upload/`);
+  } catch {
+    return false;
+  }
+}
+
+function isApprovedLegacyImageUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname === 'images.unsplash.com';
+  } catch {
+    return false;
+  }
+}
+
+export async function storeTrustedImage(value) {
+  if (isApprovedCloudinaryUrl(value) || isApprovedLegacyImageUrl(value)) return { url: value, publicId: '' };
+  if (!isCloudinaryConfigured()) throw httpError(503, 'Secure image storage is not configured.');
+  validateDataImage(value);
+  try {
+    return await uploadToCloudinary(value);
+  } catch {
+    throw httpError(502, 'The image could not be stored. Please try again.');
+  }
 }
 
 export function buildCloudinaryStubUpload(payload = {}) {
@@ -85,6 +126,7 @@ export async function uploadToCloudinary(base64Image) {
     });
 
     req.on('error', (e) => reject(e));
+    req.setTimeout(20_000, () => req.destroy(new Error('Cloudinary upload timed out.')));
     req.write(postData);
     req.end();
   });

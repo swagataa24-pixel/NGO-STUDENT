@@ -94,7 +94,7 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
         ['MongoDB', health.readiness.mongo],
         ['Google OAuth', health.readiness.googleOAuth],
         ['Cloudinary', health.readiness.cloudinary],
-        ['JWT auth', health.readiness.jwt]
+        ['Security configuration', health.readiness.securityConfig]
       ]
     : [];
 
@@ -128,7 +128,7 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
       <div className="container admin-metrics-grid">
         <Metric value={students.length} label="students in system" />
         <Metric value={classes.length} label="classes in system" />
-        <Metric value={volunteers.length} label="volunteers in system" />
+        <Metric value={volunteers.length} label="teacher profiles" />
         <Metric value={photos.length} label="activity uploads" />
       </div>
 
@@ -209,7 +209,7 @@ export function AdminPage({ students, classes, volunteers, photos, activeUser, d
                           style={{ color: ROLE_COLORS[user.role] }}
                         >
                           <option value="Viewer">Viewer</option>
-                          <option value="Teacher">Teacher / Volunteer</option>
+                          <option value="Teacher">Teacher</option>
                           <option value="Admin">Admin</option>
                         </select>
                       </td>

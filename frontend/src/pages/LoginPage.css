@@ -44,17 +44,15 @@
   transition: background 0.6s ease;
 }
 
-.auth-visual-panel.mode-signup {
-  background: linear-gradient(135deg, #1a4a3a, #0a1f1a);
-}
-
-.auth-visual-content {
+.auth-visual-content,
+.auth-visual-copy {
   position: relative;
   z-index: 5;
   animation: fade-slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.auth-visual-content h2 {
+.auth-visual-content h2,
+.auth-visual-copy h2 {
   font-family: var(--font-serif), serif;
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   line-height: 1.1;
@@ -63,7 +61,8 @@
   letter-spacing: -0.02em;
 }
 
-.auth-visual-content .eyebrow {
+.auth-visual-content .eyebrow,
+.auth-visual-copy .eyebrow {
   color: var(--color-accent);
   margin-bottom: 0.8rem;
   font-size: 0.72rem;
@@ -310,27 +309,54 @@
 
 /* Google button */
 .google-button {
-  align-items: center; background: var(--bg-secondary);
-  border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius);
-  color: var(--text-primary); display: inline-flex;
-  font-weight: 600; font-size: 0.82rem; text-transform: uppercase;
-  letter-spacing: 0.05em; gap: 0.6rem; justify-content: center;
-  min-height: 46px; padding: 0.7rem 1.2rem; width: 100%;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: inherit; cursor: pointer;
+  align-items: center; background: #fff;
+  border: 1px solid #747775; border-radius: 4px;
+  color: #1f1f1f; display: inline-flex;
+  font: 500 14px/20px Roboto, Arial, sans-serif;
+  letter-spacing: 0.25px; gap: 10px; justify-content: center;
+  min-height: 44px; padding: 0 12px; width: 100%;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 .google-button:hover {
-  background: var(--text-primary); color: var(--bg-primary);
-  border-color: transparent; transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.07);
+  background: #f8faff; color: #1f1f1f;
+  border-color: #747775;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
 }
-.google-button svg { color: #ea4335; }
-.google-button:hover svg { color: currentColor; }
+.google-button:disabled { cursor: wait; opacity: 0.65; }
 
 /* Legal note */
 .auth-legal {
   display: block; text-align: center; color: var(--text-muted);
   font-size: 0.71rem; line-height: 1.5; margin-top: 1rem;
+}
+
+.portal-identity-note {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(70, 91, 84, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.portal-identity-note strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--ink);
+}
+
+.portal-identity-note p {
+  margin: 0 0 0.45rem;
+}
+
+.portal-identity-note a,
+.auth-legal a {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Signed-in redirect card */

@@ -46,7 +46,7 @@ export async function create(req, res, next) {
     // Add author info
     const note = {
       ...req.body,
-      author: req.user ? (req.user.name || req.user.email) : 'Anonymous',
+      teacherId: req.user.id,
       createdAt: new Date()
     };
     

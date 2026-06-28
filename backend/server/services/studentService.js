@@ -1,18 +1,12 @@
 import { Student } from '../models/Student.js';
 import { ClassGroup } from '../models/ClassGroup.js';
-import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService.js';
+import { storeTrustedImage } from './cloudinaryService.js';
 import mongoose from 'mongoose';
 
 async function processPhotoUrl(photoUrl) {
-  if (photoUrl && photoUrl.startsWith('data:') && isCloudinaryConfigured()) {
-    try {
-      const result = await uploadToCloudinary(photoUrl);
-      return result.url;
-    } catch (err) {
-      console.error('Cloudinary upload failed for student photo, falling back:', err.message);
-    }
-  }
-  return photoUrl;
+  if (!photoUrl) return '';
+  const result = await storeTrustedImage(photoUrl);
+  return result.url;
 }
 
 function normalizeStudentPayload(payload) {

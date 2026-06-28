@@ -1,15 +1,14 @@
 import crypto from 'node:crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const KEY_HEX = process.env.FIELD_ENCRYPTION_KEY || '';
-const HMAC_SECRET = process.env.HMAC_SECRET || 'dev-hmac-secret';
 
 function getKey() {
+  const KEY_HEX = process.env.FIELD_ENCRYPTION_KEY || '';
   if (KEY_HEX && KEY_HEX.length === 64) {
     return Buffer.from(KEY_HEX, 'hex');
   }
   // Derive a consistent 32-byte key from a fallback passphrase (dev only)
-  return crypto.scryptSync('upay-dev-key', 'upay-salt', 32);
+  return crypto.scryptSync('upayinfopvt-dev-key', 'upayinfopvt-salt', 32);
 }
 
 /**
@@ -54,5 +53,6 @@ export function decrypt(stored) {
  */
 export function hmacIndex(value) {
   if (!value) return '';
+  const HMAC_SECRET = process.env.HMAC_SECRET || 'dev-only-hmac-secret';
   return crypto.createHmac('sha256', HMAC_SECRET).update(String(value).toLowerCase().trim()).digest('hex');
 }

@@ -28,7 +28,7 @@ function photoCenter(photo) {
 }
 
 function photoActivity(photo) {
-  return photo.activity || photo.caption || 'Class proof';
+  return photo.activity || photo.caption || 'Class photo';
 }
 
 export function ReportsPage({ activeUser, students, photos, volunteers = [], classes: classGroups = [] }) {
@@ -103,7 +103,7 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
         <div className="reports-hero-copy">
           <span className="eyebrow">Analytics</span>
           <h2>Reports dashboard</h2>
-          <p>Review class attendance, intervention alerts, volunteer contribution, and activity proof in one export-ready workspace.</p>
+          <p>Review class attendance, follow-up notes, teacher activity, and optional class photos in one export-ready workspace.</p>
         </div>
 
         <div className="reports-control-panel" aria-label="Report filters">
@@ -257,13 +257,13 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
             {filteredStudents.length > 0 && <Metric value={`${filteredStudents.length}`} label="student records" />}
             {filteredStudents.length > 0 && <Metric value={`${report.averageAttendance}%`} label="average attendance" />}
             {report.interventionStudents.length > 0 && <Metric value={`${report.interventionStudents.length}`} label="intervention alerts" />}
-            {report.volunteerHours > 0 && <Metric value={`${report.volunteerHours}h`} label="volunteer hours" />}
+            {report.volunteerHours > 0 && <Metric value={`${report.volunteerHours}h`} label="recorded teacher hours" />}
             {report.photoCount > 0 && <Metric value={report.photoCount} label="linked photos" />}
           </div>
         </div>
       ) : (
         <div className="container">
-          <EmptyState title="No report data yet" text="Take attendance or link a class photo proof to generate charts and details." />
+          <EmptyState title="No report data yet" text="Take attendance or add a class photo to generate charts and details." />
         </div>
       )}
 
@@ -318,11 +318,11 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
             <div className="reports-card-heading">
               <div>
                 <span className="eyebrow">People</span>
-                <h3>Volunteer Contribution</h3>
+                <h3>Teacher Activity</h3>
               </div>
             </div>
             <ResponsiveTable
-              headers={['Volunteer', 'Role', 'Availability', 'Hours']}
+              headers={['Teacher', 'Role', 'Availability', 'Hours']}
               rows={volunteers.map((volunteer) => [
                 volunteer.name,
                 volunteer.role,
@@ -337,7 +337,7 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
             <div className="reports-card-heading">
               <div>
                 <span className="eyebrow">Evidence</span>
-                <h3>Activity Photo Proof</h3>
+                <h3>Class Activity Photos</h3>
               </div>
             </div>
             <ResponsiveTable
@@ -361,9 +361,9 @@ export function ReportsPage({ activeUser, students, photos, volunteers = [], cla
             <button className="icon-button image-preview-close" onClick={() => setPreviewPhoto(null)} aria-label="Close preview" type="button">
               <X size={18} />
             </button>
-            <img src={previewPhoto.imageUrl} alt={previewPhoto.caption || 'Linked class proof'} />
+            <img src={previewPhoto.imageUrl} alt={previewPhoto.caption || 'Linked class photo'} />
             <div>
-              <strong>{previewPhoto.caption || 'Linked class proof'}</strong>
+              <strong>{previewPhoto.caption || 'Linked class photo'}</strong>
               <span>{photoDate(previewPhoto)}</span>
             </div>
           </div>

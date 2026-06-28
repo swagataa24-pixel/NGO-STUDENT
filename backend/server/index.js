@@ -1,10 +1,13 @@
 import cors from 'cors';
 import dns from 'node:dns';
-import dotenv from 'dotenv';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import session from 'express-session';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
-import { buildToken } from './services/authService.js';
+import MongoStore from 'connect-mongo';
+import { envList, isProduction, primaryClientUrl, validateProductionEnvironment } from './config/env.js';
+import { createOneTimeAuthCode } from './services/authService.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/authRoutes.js';
 import { attendanceRouter } from './routes/attendanceRoutes.js';
@@ -17,14 +20,17 @@ import { passport } from './services/passportService.js';
 import { userRouter } from './routes/userRoutes.js';
 import { volunteerRouter } from './routes/volunteerRoutes.js';
 
-dotenv.config();
+validateProductionEnvironment();
 dns.setServers((process.env.DNS_SERVERS || '8.8.8.8,1.1.1.1').split(',').map((server) => server.trim()));
 mongoose.set('bufferCommands', false);
 
 const app = express();
 const port = process.env.PORT || 5000;
+const frontendUrl = primaryClientUrl();
+const allowedOrigins = envList('CLIENT_URL').length ? envList('CLIENT_URL') : ['http://localhost:5173'];
 let mongoReady = false;
 let mongoError = '';
+
 const apiRoutes = {
   auth: process.env.API_ROUTE_AUTH || '/api/auth',
   users: process.env.API_ROUTE_USERS || '/api/users',
@@ -37,99 +43,123 @@ const apiRoutes = {
   reports: process.env.API_ROUTE_REPORTS || '/api/reports'
 };
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Too many authentication attempts. Please try again later.' }
+});
 
+app.set('trust proxy', 1);
 app.disable('x-powered-by');
-
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'same-site' },
+    referrerPolicy: { policy: 'no-referrer' }
+  })
+);
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error('CORS origin blocked by server configuration.'));
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'dev-session-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-    }
-  })
-);
+app.use(express.urlencoded({ extended: false, limit: '1mb' }));
+
+const sessionOptions = {
+  name: 'upayinfoPVT.oauth',
+  secret: process.env.SESSION_SECRET || 'development-only-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  rolling: false,
+  cookie: {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    maxAge: 10 * 60 * 1000
+  }
+};
+if (process.env.MONGO_URI) {
+  sessionOptions.store = MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 10 * 60,
+    crypto: { secret: process.env.SESSION_SECRET || 'development-only-session-secret' }
+  });
+}
+
+app.use(session(sessionOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 
+function frontendLoginUrl(params = {}) {
+  const url = new URL(process.env.CLIENT_LOGIN_ROUTE || '/login', frontendUrl);
+  Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+  return url.toString();
+}
+
+function frontendLoginCodeUrl(code) {
+  const url = new URL(process.env.CLIENT_LOGIN_ROUTE || '/login', frontendUrl);
+  url.hash = new URLSearchParams({ code }).toString();
+  return url.toString();
+}
+
 app.get('/', (_req, res) => {
-  res.json({
-    app: 'UPAY NGO API',
-    message: 'API server is running. Open the frontend at http://localhost:5173 or check API health at /api/health.',
-    frontend: process.env.CLIENT_URL || 'http://localhost:5173',
-    health: '/api/health'
-  });
+  res.json({ app: 'upayinfoPVT API', message: 'API server is running.', frontend: frontendUrl, health: '/api/health' });
 });
 
 app.get('/api/health', (_req, res) => {
   res.json({
-    ok: true,
-    app: 'UPAY NGO API',
+    ok: mongoReady,
+    app: 'upayinfoPVT API',
     readiness: {
       mongo: mongoReady,
-      mongoError,
+      ...(!isProduction && mongoError ? { mongoError } : {}),
       googleOAuth: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
       cloudinary: Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
-      jwt: Boolean(process.env.JWT_SECRET)
+      securityConfig: Boolean(process.env.JWT_SECRET && process.env.SESSION_SECRET && process.env.FIELD_ENCRYPTION_KEY && process.env.HMAC_SECRET)
     }
   });
 });
 
 app.get(
   '/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email']
-  })
+  authLimiter,
+  passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' })
 );
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: 'https://ngo-student-f.onrender.com/login'
-  }),
-  (req, res) => {
-    const frontendUrl = process.env.CLIENT_URL || 'https://ngo-student-f.onrender.com';
-    const redirectUrl = new URL('/login', frontendUrl);
-    redirectUrl.searchParams.set('token', buildToken(req.user));
-    redirectUrl.searchParams.set('user', Buffer.from(JSON.stringify(req.user)).toString('base64url'));
-    res.redirect(redirectUrl.toString());
+  authLimiter,
+  passport.authenticate('google', { failureRedirect: frontendLoginUrl({ error: 'google_auth_failed' }) }),
+  async (req, res, next) => {
+    try {
+      const code = await createOneTimeAuthCode(req.user);
+      const destination = frontendLoginCodeUrl(code);
+      req.session.destroy((sessionError) => {
+        if (sessionError) return next(sessionError);
+        return res.redirect(destination);
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
 function requireMongo(req, res, next) {
-  if (mongoose.connection.readyState === 1) {
-    return next();
-  }
-
-  return res.status(503).json({
-    message: 'MongoDB is not connected. Check MONGO_URI, Atlas network access, database user credentials, and DNS/network connectivity.',
-    mongoReady: false,
-    mongoError
-  });
+  if (mongoose.connection.readyState === 1) return next();
+  return res.status(503).json({ message: 'Service is temporarily unavailable.', mongoReady: false });
 }
 
-app.use(apiRoutes.auth, authRouter);
-app.use(apiRoutes.users, userRouter);
+app.use(apiRoutes.auth, authLimiter, requireMongo, authRouter);
+app.use(apiRoutes.users, requireMongo, userRouter);
 app.use(apiRoutes.classes, requireMongo, classRouter);
 app.use(apiRoutes.students, requireMongo, studentRouter);
 app.use(apiRoutes.attendance, requireMongo, attendanceRouter);
@@ -138,10 +168,7 @@ app.use(apiRoutes.volunteers, requireMongo, volunteerRouter);
 app.use(apiRoutes.photos, requireMongo, photoRouter);
 app.use(apiRoutes.reports, requireMongo, reportRouter);
 
-app.use((_req, res) => {
-  res.status(404).json({ message: 'Route not found.' });
-});
-
+app.use((_req, res) => res.status(404).json({ message: 'Route not found.' }));
 app.use(errorHandler);
 
 async function start() {
@@ -151,18 +178,19 @@ async function start() {
       mongoReady = true;
       console.log('MongoDB connected');
     } catch (error) {
-      mongoReady = false;
       mongoError = error.message;
-      console.log(`MongoDB connection failed: ${error.message}`);
+      console.error('MongoDB connection failed');
+      if (isProduction) throw error;
     }
   } else {
     mongoError = 'MONGO_URI missing';
-    console.log('MONGO_URI missing; API is running with route skeletons only.');
+    console.warn('MONGO_URI missing; protected API routes are unavailable.');
   }
-  app.listen(port, () => console.log(`UPAY API listening on http://localhost:${port}`));
+
+  app.listen(port, () => console.log(`upayinfoPVT API listening on http://localhost:${port}`));
 }
 
 start().catch((error) => {
-  console.error(error);
-  app.listen(port, () => console.log(`UPAY API listening on http://localhost:${port}`));
+  console.error(`Server startup failed: ${error.message}`);
+  process.exit(1);
 });
