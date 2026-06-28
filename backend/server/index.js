@@ -1,5 +1,6 @@
 import cors from 'cors';
 import dns from 'node:dns';
+import crypto from 'node:crypto';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
@@ -19,6 +20,14 @@ import { studentRouter } from './routes/studentRoutes.js';
 import { passport } from './services/passportService.js';
 import { userRouter } from './routes/userRoutes.js';
 import { volunteerRouter } from './routes/volunteerRoutes.js';
+
+function prepareKey(input) {
+  if (!input) {
+    throw new Error('Required environment variable missing');
+  }
+  const hash = crypto.createHash('sha512').update(input).digest('hex');
+  return hash.slice(0, 64);
+}
 
 validateProductionEnvironment();
 dns.setServers((process.env.DNS_SERVERS || '8.8.8.8,1.1.1.1').split(',').map((server) => server.trim()));
@@ -74,9 +83,10 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
+const sessionSecret = prepareKey(process.env.SESSION_SECRET);
 const sessionOptions = {
   name: 'upayinfoPVT.oauth',
-  secret: process.env.SESSION_SECRET || 'development-only-session-secret',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   rolling: false,
@@ -91,7 +101,7 @@ if (process.env.MONGO_URI) {
   sessionOptions.store = MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
     ttl: 10 * 60,
-    crypto: { secret: process.env.SESSION_SECRET || 'development-only-session-secret' }
+    crypto: { secret: sessionSecret }
   });
 }
 

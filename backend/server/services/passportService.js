@@ -6,9 +6,9 @@ import { resolveAuthenticatedUser } from './authService.js';
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID || 'missing-google-client-id',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'missing-google-client-secret',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/auth/google/callback',
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       state: true
     },
     async (_accessToken, _refreshToken, profile, done) => {

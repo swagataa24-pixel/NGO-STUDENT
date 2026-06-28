@@ -2,13 +2,23 @@ import crypto from 'node:crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 
-function getKey() {
-  const KEY_HEX = process.env.FIELD_ENCRYPTION_KEY || '';
-  if (KEY_HEX && KEY_HEX.length === 64) {
-    return Buffer.from(KEY_HEX, 'hex');
+// Helper to safely extract and prepare keys
+function prepareHexKey(input, requiredLength) {
+  if (!input) {
+    throw new Error(`Required environment variable missing`);
   }
-  // Derive a consistent 32-byte key from a fallback passphrase (dev only)
-  return crypto.scryptSync('upayinfopvt-dev-key', 'upayinfopvt-salt', 32);
+  
+  // First, hash the input to get consistent, clean hex
+  const hash = crypto.createHash('sha512').update(input).digest('hex');
+  // Take first N characters from the hash (N is requiredLength)
+  return hash.slice(0, requiredLength);
+}
+
+function getKey() {
+  const KEY_INPUT = process.env.FIELD_ENCRYPTION_KEY;
+  // Extract exactly 64 hex characters (first 32 bytes of hash)
+  const keyHex = prepareHexKey(KEY_INPUT, 64);
+  return Buffer.from(keyHex, 'hex');
 }
 
 /**
@@ -53,6 +63,11 @@ export function decrypt(stored) {
  */
 export function hmacIndex(value) {
   if (!value) return '';
-  const HMAC_SECRET = process.env.HMAC_SECRET || 'dev-only-hmac-secret';
-  return crypto.createHmac('sha256', HMAC_SECRET).update(String(value).toLowerCase().trim()).digest('hex');
+  const HMAC_INPUT = process.env.HMAC_SECRET;
+  if (!HMAC_INPUT) {
+    throw new Error('HMAC_SECRET is required');
+  }
+  // Hash input and take first 64 chars (32 bytes) for HMAC key
+  const hmacKey = prepareHexKey(HMAC_INPUT, 64);
+  return crypto.createHmac('sha256', hmacKey).update(String(value).toLowerCase().trim()).digest('hex');
 }

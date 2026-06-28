@@ -7,6 +7,14 @@ import { httpError } from '../utils/httpError.js';
 
 const AUTH_CODE_TTL_MS = 2 * 60 * 1000;
 
+function prepareKey(input) {
+  if (!input) {
+    throw new Error('Required environment variable missing');
+  }
+  const hash = crypto.createHash('sha512').update(input).digest('hex');
+  return hash.slice(0, 64);
+}
+
 function parseAdminEmails() {
   return (process.env.ADMIN_EMAILS || '')
     .split(',')
@@ -34,7 +42,7 @@ export function publicUser(user) {
 }
 
 export function buildToken(user) {
-  const secret = process.env.JWT_SECRET || 'development-only-jwt-secret';
+  const secret = prepareKey(process.env.JWT_SECRET);
   const safeUser = publicUser(user);
   return jwt.sign(
     { id: safeUser.id },

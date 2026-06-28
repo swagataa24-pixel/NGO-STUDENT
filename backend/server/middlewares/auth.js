@@ -1,7 +1,16 @@
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { User } from '../models/User.js';
 import { publicUser } from '../services/authService.js';
+
+function prepareKey(input) {
+  if (!input) {
+    throw new Error('Required environment variable missing');
+  }
+  const hash = crypto.createHash('sha512').update(input).digest('hex');
+  return hash.slice(0, 64);
+}
 
 export async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
@@ -9,7 +18,8 @@ export async function requireAuth(req, res, next) {
   if (!token) return res.status(401).json({ message: 'Authentication required.' });
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'development-only-jwt-secret', {
+    const secret = prepareKey(process.env.JWT_SECRET);
+    const payload = jwt.verify(token, secret, {
       issuer: 'upayinfopvt-api',
       audience: 'upayinfopvt-workspace'
     });
