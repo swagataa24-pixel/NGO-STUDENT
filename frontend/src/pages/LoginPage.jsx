@@ -5,19 +5,8 @@ import { config } from '../config.js';
 import { apiRequest } from '../utils/api.js';
 import './LoginPage.css';
 
-function GoogleMark() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19">
-      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z" />
-      <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.36l-3.24-2.54c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z" />
-      <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.07 12c0-.67.12-1.32.32-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.55l3.35-2.62Z" />
-      <path fill="#EA4335" d="M12 5.94c1.47 0 2.78.5 3.82 1.49l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z" />
-    </svg>
-  );
-}
-
 function authErrorMessage(value) {
-  if (value === 'google_auth_failed') return 'Google sign-in was cancelled or could not be verified. Please try again.';
+  if (value === 'google_auth_failed') return 'Sign-in was cancelled or could not be verified. Please try again.';
   return value ? 'Sign-in could not be completed. Please try again.' : '';
 }
 
@@ -62,7 +51,7 @@ export function LoginPage({ activeUser, setActiveUser }) {
     return () => clearTimeout(timer);
   }, [activeUser, location.state, navigate]);
 
-  const googleAuth = () => window.location.assign(`${config.authBaseUrl}${config.apiRoutes.authGoogle}`);
+  const authProviderRedirect = () => window.location.assign(`${config.authBaseUrl}${config.apiRoutes.authGoogle}`);
 
   return (
     <section className="section auth-section">
@@ -89,17 +78,17 @@ export function LoginPage({ activeUser, setActiveUser }) {
           ) : (
             <div className="auth-card">
               <h1 className="form-title">Sign in to {config.appName}</h1>
-              <p className="auth-intro">Use your verified Google account. New accounts receive no classroom access until the workspace owner approves them.</p>
+              <p className="auth-intro">Use your verified teacher account. New accounts receive no classroom access until the workspace owner approves them.</p>
 
               {error && <p className="auth-error" role="alert">{error}</p>}
 
-              <button className="google-button" type="button" onClick={googleAuth} disabled={loading}>
-                <GoogleMark /> {loading ? 'Verifying with Google…' : 'Sign in with Google'}
+              <button className="auth-provider-button" type="button" onClick={authProviderRedirect} disabled={loading}>
+                {loading ? 'Verifying access…' : 'Secure Teacher Sign-in'}
               </button>
 
               <div className="portal-identity-note">
                 <strong>Know where you are signing in</strong>
-                <p>{config.appName} is an independently operated personal productivity tool hosted on Render, not a public or institution-operated service. Google authenticates your identity; this tool never asks for or receives your Google password.</p>
+                <p>{config.appName} is an independently operated personal productivity tool hosted on Render, not a public or institution-operated service. This tool authenticates your identity securely without ever asking for or receiving your personal password.</p>
               </div>
 
               <small className="auth-legal">
